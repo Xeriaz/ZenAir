@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, INITIAL_USER_PROFILE } from '../db/db';
+import { db } from '../db/db';
 import { getTodayDateString } from '../utils/dates';
-import { calculateStatsUpdate } from '../utils/gamification';
 
 export function useTasks() {
   const todayStr = getTodayDateString();
@@ -10,21 +9,14 @@ export function useTasks() {
     return await db.tasks.where('date').equals(todayStr).sortBy('startTime');
   }, [todayStr]);
 
-  const toggleTask = async (id: number): Promise<{ completed: boolean; leveledUp: boolean }> => {
+  const toggleTask = async (id: number): Promise<{ completed: boolean }> => {
     const task = await db.tasks.get(id);
-    if (!task) return { completed: false, leveledUp: false };
+    if (!task) return { completed: false };
 
     const newCompleted = !task.completed;
     await db.tasks.update(id, { completed: newCompleted });
 
-    const profile = (await db.userProfile.toCollection().first()) ?? INITIAL_USER_PROFILE;
-    const xpDelta = newCompleted ? 15 : -15;
-    const goldDelta = newCompleted ? 5 : -5;
-
-    const { updated, leveledUp } = calculateStatsUpdate(profile, xpDelta, goldDelta);
-    await db.userProfile.put(updated);
-
-    return { completed: newCompleted, leveledUp };
+    return { completed: newCompleted };
   };
 
   const createTask = async (data: {

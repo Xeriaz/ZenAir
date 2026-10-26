@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Download, Upload, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles } from 'lucide-react';
-import { downloadDatabaseBackup, importDatabaseFromJson, db, initializeDatabase } from '../../db/db';
+import { downloadDatabaseBackup, importDatabaseFromJson, db, INITIAL_HABITS } from '../../db/db';
 import { generate50DaysDemoData } from '../../db/seedData';
+import type { Habit } from '../../types';
 
 export const SettingsView: React.FC = () => {
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError?: boolean } | null>(null);
@@ -61,10 +62,17 @@ export const SettingsView: React.FC = () => {
   };
 
   const handleResetDefaults = async () => {
-    if (window.confirm('Reset habits to recommended defaults? Your streak stats and history will be kept.')) {
-      await db.habits.clear();
-      await initializeDatabase();
-      setStatusMessage({ text: 'Recommended habits re-initialized!' });
+    if (
+      window.confirm(
+        'Reset habits to recommended defaults? This will restore standard starter habits and reset their tracking history.'
+      )
+    ) {
+      await db.transaction('rw', [db.habits, db.habitLogs], async () => {
+        await db.habits.clear();
+        await db.habitLogs.clear();
+        await db.habits.bulkAdd(INITIAL_HABITS as Habit[]);
+      });
+      setStatusMessage({ text: 'Recommended starter habits restored!' });
       setTimeout(() => setStatusMessage(null), 3000);
     }
   };

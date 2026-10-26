@@ -1,130 +1,119 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, INITIAL_USER_PROFILE } from '../db/db';
+import { db } from '../db/db';
 import type { Habit, HabitDifficulty, HabitLog, HabitType, TimeOfDay } from '../types';
-import { getTodayDateString, getYesterdayDateString } from '../utils/dates';
-import { calculateStatsUpdate, getRewardsForDifficulty } from '../utils/gamification';
+import { getTodayDateString, getYesterdayDateString, calculateStreakFromDates } from '../utils/dates';
 
 export function useHabits() {
   const todayStr = getTodayDateString();
   const yesterdayStr = getYesterdayDateString();
 
   const habits = useLiveQuery(async () => {
-    return await db.habits.filter(h => !h.archived).toArray();
+    return await db.habits.filter((h) => !h.archived).toArray();
   }, []);
 
   const todayLogs = useLiveQuery(async () => {
     return await db.habitLogs.where('date').equals(todayStr).toArray();
   }, [todayStr]);
 
-  const activeHabits = habits ?? [];
+  // Query logs for computing dynamic streak progression
+  const allHabitLogs = useLiveQuery(async () => {
+    return await db.habitLogs.toArray();
+  }, []);
+
   const logsMap = new Map<number, HabitLog>();
-  (todayLogs ?? []).forEach(log => logsMap.set(log.habitId, log));
+  (todayLogs ?? []).forEach((log) => logsMap.set(log.habitId, log));
 
-  const toggleDailyHabit = async (habitId: number): Promise<{ completed: boolean; leveledUp: boolean; xpEarned: number }> => {
-    const habit = await db.habits.get(habitId);
-    if (!habit) return { completed: false, leveledUp: false, xpEarned: 0 };
+  // Map dates per habit to derive active streak dynamically
+  const datesByHabit = new Map<number, string[]>();
+  (allHabitLogs ?? []).forEach((log) => {
+    if (log.count > 0) {
+      const dates = datesByHabit.get(log.habitId) || [];
+      dates.push(log.date);
+      datesByHabit.set(log.habitId, dates);
+    }
+  });
 
-    const existingLog = await db.habitLogs
-      .where('[habitId+date]')
-      .equals([habitId, todayStr])
-      .first();
+  const activeHabits = (habits ?? []).map((h) => {
+    if (!h.id) return h;
+    const dates = datesByHabit.get(h.id) || [];
+    const currentStreak = calculateStreakFromDates(dates, todayStr, yesterdayStr);
+    const bestStreak = Math.max(h.bestStreak || 0, currentStreak);
+    return {
+      ...h,
+      streak: currentStreak,
+      bestStreak
+    };
+  });
 
-    const rewards = getRewardsForDifficulty(habit.difficulty);
-    const profile = (await db.userProfile.toCollection().first()) ?? INITIAL_USER_PROFILE;
+  const toggleDailyHabit = async (habitId: number): Promise<{ completed: boolean }> => {
+    return await db.transaction('rw', [db.habits, db.habitLogs], async () => {
+      const habit = await db.habits.get(habitId);
+      if (!habit) return { completed: false };
 
-    if (existingLog) {
-      // Uncheck / Undo completion
-      if (existingLog.id) {
-        await db.habitLogs.delete(existingLog.id);
-      }
-      
-      const newStreak = Math.max(0, habit.streak - 1);
-      await db.habits.update(habitId, { streak: newStreak });
-
-      // Deduct rewards
-      const { updated } = calculateStatsUpdate(profile, -rewards.xp, -rewards.gold);
-      await db.userProfile.put(updated);
-
-      return { completed: false, leveledUp: false, xpEarned: 0 };
-    } else {
-      // Check yesterday's log to calculate streak
-      const yesterdayLog = await db.habitLogs
+      const existingLog = await db.habitLogs
         .where('[habitId+date]')
-        .equals([habitId, yesterdayStr])
+        .equals([habitId, todayStr])
         .first();
 
-      let newStreak = habit.streak;
-
-      if (yesterdayLog) {
-        newStreak = habit.streak + 1;
+      if (existingLog && existingLog.id) {
+        // Uncheck / Undo completion
+        await db.habitLogs.delete(existingLog.id);
+        return { completed: false };
       } else {
-        // Streak broken or brand new
-        newStreak = 1;
+        // Add completion log for today
+        await db.habitLogs.add({
+          habitId,
+          date: todayStr,
+          count: 1,
+          xpEarned: 0,
+          timestamp: Date.now()
+        });
+
+        // Update persistent bestStreak if current streak surpasses it
+        const dates = [...(datesByHabit.get(habitId) || []), todayStr];
+        const newStreak = calculateStreakFromDates(dates, todayStr, yesterdayStr);
+        if (newStreak > (habit.bestStreak || 0)) {
+          await db.habits.update(habitId, { bestStreak: newStreak });
+        }
+
+        return { completed: true };
       }
-
-      const bestStreak = Math.max(habit.bestStreak || 0, newStreak);
-      await db.habits.update(habitId, { streak: newStreak, bestStreak });
-
-      // Add log
-      await db.habitLogs.add({
-        habitId,
-        date: todayStr,
-        count: 1,
-        xpEarned: rewards.xp,
-        timestamp: Date.now()
-      });
-
-      // Award XP & Gold in background
-      const { updated, leveledUp } = calculateStatsUpdate(profile, rewards.xp, rewards.gold);
-      await db.userProfile.put(updated);
-
-      return { completed: true, leveledUp, xpEarned: rewards.xp };
-    }
+    });
   };
 
-  const logHabitCounter = async (habitId: number, isPositive: boolean): Promise<{ count: number; leveledUp: boolean }> => {
-    const habit = await db.habits.get(habitId);
-    if (!habit) return { count: 0, leveledUp: false };
+  const logHabitCounter = async (habitId: number, isPositive: boolean): Promise<{ count: number }> => {
+    return await db.transaction('rw', [db.habits, db.habitLogs], async () => {
+      const habit = await db.habits.get(habitId);
+      if (!habit) return { count: 0 };
 
-    const existingLog = await db.habitLogs
-      .where('[habitId+date]')
-      .equals([habitId, todayStr])
-      .first();
+      const existingLog = await db.habitLogs
+        .where('[habitId+date]')
+        .equals([habitId, todayStr])
+        .first();
 
-    const rewards = getRewardsForDifficulty(habit.difficulty);
-    const profile = (await db.userProfile.toCollection().first()) ?? INITIAL_USER_PROFILE;
+      const newCount = Math.max(0, (existingLog?.count ?? 0) + (isPositive ? 1 : -1));
 
-    const xpDelta = isPositive ? rewards.xp : -10;
-    const goldDelta = isPositive ? rewards.gold : 0;
+      if (existingLog && existingLog.id) {
+        if (newCount === 0) {
+          await db.habitLogs.delete(existingLog.id);
+        } else {
+          await db.habitLogs.update(existingLog.id, {
+            count: newCount,
+            timestamp: Date.now()
+          });
+        }
+      } else if (newCount > 0) {
+        await db.habitLogs.add({
+          habitId,
+          date: todayStr,
+          count: newCount,
+          xpEarned: 0,
+          timestamp: Date.now()
+        });
+      }
 
-    let newCount = (existingLog?.count ?? 0) + (isPositive ? 1 : -1);
-
-    if (existingLog && existingLog.id) {
-      await db.habitLogs.update(existingLog.id, {
-        count: newCount,
-        xpEarned: existingLog.xpEarned + xpDelta,
-        timestamp: Date.now()
-      });
-    } else {
-      await db.habitLogs.add({
-        habitId,
-        date: todayStr,
-        count: Math.max(1, newCount),
-        xpEarned: Math.max(0, xpDelta),
-        timestamp: Date.now()
-      });
-    }
-
-    if (isPositive) {
-      const newStreak = Math.max(1, habit.streak + 1);
-      const bestStreak = Math.max(habit.bestStreak, newStreak);
-      await db.habits.update(habitId, { streak: newStreak, bestStreak });
-    }
-
-    const { updated, leveledUp } = calculateStatsUpdate(profile, xpDelta, goldDelta);
-    await db.userProfile.put(updated);
-
-    return { count: newCount, leveledUp };
+      return { count: newCount };
+    });
   };
 
   const createHabit = async (data: {

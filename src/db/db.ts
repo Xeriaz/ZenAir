@@ -18,6 +18,9 @@ export class ZenAirDatabase extends Dexie {
       breathingLogs: '++id, exerciseId, durationSeconds, completedAt',
       userProfile: '++id, level, xp, gold, streakFreezes, defaultBreathingId, preferredSessionMinutes, theme'
     });
+    this.version(2).stores({
+      habitLogs: '++id, habitId, date, count, xpEarned, timestamp, &[habitId+date]'
+    });
   }
 }
 
@@ -40,7 +43,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'morning',
     scheduledTime: '07:30',
-    streak: 5,
+    streak: 0,
     bestStreak: 14,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
@@ -51,7 +54,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'morning',
     scheduledTime: '08:00',
-    streak: 4,
+    streak: 0,
     bestStreak: 12,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
@@ -62,7 +65,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'afternoon',
     scheduledTime: '14:00',
-    streak: 7,
+    streak: 0,
     bestStreak: 19,
     difficulty: 'medium',
     createdAt: new Date().toISOString(),
@@ -72,7 +75,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     title: 'Mindful Posture & Stretch',
     type: 'positive_negative',
     timeOfDay: 'anytime',
-    streak: 9,
+    streak: 0,
     bestStreak: 15,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
@@ -83,7 +86,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'evening',
     scheduledTime: '21:30',
-    streak: 3,
+    streak: 0,
     bestStreak: 10,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
@@ -153,8 +156,46 @@ export async function downloadDatabaseBackup(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
+function isValidHabit(h: unknown): h is Habit {
+  return (
+    typeof h === 'object' &&
+    h !== null &&
+    typeof (h as Habit).title === 'string' &&
+    typeof (h as Habit).type === 'string' &&
+    typeof (h as Habit).timeOfDay === 'string'
+  );
+}
+
+function isValidTask(t: unknown): t is TaskItem {
+  return (
+    typeof t === 'object' &&
+    t !== null &&
+    typeof (t as TaskItem).title === 'string' &&
+    typeof (t as TaskItem).date === 'string'
+  );
+}
+
+function isValidHabitLog(l: unknown): l is HabitLog {
+  return (
+    typeof l === 'object' &&
+    l !== null &&
+    typeof (l as HabitLog).habitId === 'number' &&
+    typeof (l as HabitLog).date === 'string'
+  );
+}
+
+function isValidBreathingLog(b: unknown): b is BreathingLog {
+  return (
+    typeof b === 'object' &&
+    b !== null &&
+    typeof (b as BreathingLog).exerciseId === 'string' &&
+    typeof (b as BreathingLog).durationSeconds === 'number'
+  );
+}
+
 /**
- * Imports a JSON string into Dexie, replacing or merging existing tables safely inside a transaction.
+ * Imports a JSON string into Dexie, replacing existing tables safely inside a transaction.
+ * Performs rigorous pre-validation to avoid database corruption or wiping data on invalid files.
  */
 export async function importDatabaseFromJson(jsonString: string): Promise<boolean> {
   try {
@@ -162,6 +203,23 @@ export async function importDatabaseFromJson(jsonString: string): Promise<boolea
 
     if (!data.version || !Array.isArray(data.habits) || !Array.isArray(data.userProfile)) {
       throw new Error('Invalid backup file schema: missing required tables');
+    }
+
+    // Pre-validate all records before opening the write transaction
+    if (!data.habits.every(isValidHabit)) {
+      throw new Error('Invalid habit records detected in backup');
+    }
+
+    if (data.tasks && !data.tasks.every(isValidTask)) {
+      throw new Error('Invalid task records detected in backup');
+    }
+
+    if (data.habitLogs && !data.habitLogs.every(isValidHabitLog)) {
+      throw new Error('Invalid habit log records detected in backup');
+    }
+
+    if (data.breathingLogs && !data.breathingLogs.every(isValidBreathingLog)) {
+      throw new Error('Invalid breathing log records detected in backup');
     }
 
     await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.tasks, db.breathingLogs], async () => {

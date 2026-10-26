@@ -4,10 +4,9 @@ import { BREATHING_STANDARDS } from '../../utils/breathingData';
 import type { BreathingExerciseId } from '../../types';
 import { useGamification } from '../../hooks/useGamification';
 import { db } from '../../db/db';
-import { BREATHING_SESSION_REWARD } from '../../utils/gamification';
 
 export const BreathingView: React.FC = () => {
-  const { profile, updatePreferences, addXpAndGold } = useGamification();
+  const { profile, updatePreferences } = useGamification();
 
   const [selectedId, setSelectedId] = useState<BreathingExerciseId>('box');
   const [sessionMinutes, setSessionMinutes] = useState<number>(3);
@@ -45,6 +44,16 @@ export const BreathingView: React.FC = () => {
     await updatePreferences({ defaultBreathingId: selectedId });
   };
 
+  const resetSession = () => {
+    setIsActive(false);
+    setStepIndex(0);
+    setPhaseSecondsLeft(currentStandard.steps[0]?.durationSeconds || 4);
+    setTotalSecondsLeft(sessionMinutes * 60);
+    setWimCycle(1);
+    setWimState('breathing');
+    setRetentionSeconds(0);
+  };
+
   // Change duration
   const handleSelectDuration = async (mins: number) => {
     setSessionMinutes(mins);
@@ -61,17 +70,7 @@ export const BreathingView: React.FC = () => {
     resetSession();
   };
 
-  const resetSession = () => {
-    setIsActive(false);
-    setStepIndex(0);
-    setPhaseSecondsLeft(currentStandard.steps[0]?.durationSeconds || 4);
-    setTotalSecondsLeft(sessionMinutes * 60);
-    setWimCycle(1);
-    setWimState('breathing');
-    setRetentionSeconds(0);
-  };
-
-  // Main Phase Runner (Interval decoupled from animation rendering)
+  // Main Phase Runner
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -86,14 +85,11 @@ export const BreathingView: React.FC = () => {
         if (wimState === 'breathing') {
           setPhaseSecondsLeft((prev) => {
             if (prev <= 1) {
-              // Toggle between Inhale (2s) and Release (1.5s ~ 2s)
               setStepIndex((curStep) => {
                 const nextStep = curStep === 0 ? 1 : 0;
                 if (nextStep === 0) {
-                  // Completed one power breath cycle
                   setWimCycle((c) => {
                     if (c >= 30) {
-                      // Move to retention hold!
                       setWimState('retention');
                       setRetentionSeconds(0);
                       return 30;
@@ -108,13 +104,10 @@ export const BreathingView: React.FC = () => {
             return prev - 1;
           });
         } else if (wimState === 'retention') {
-          // Retention hold stopwatch counts upwards
           setRetentionSeconds((s) => s + 1);
         } else if (wimState === 'recovery') {
-          // 15 seconds recovery breath hold
           setPhaseSecondsLeft((prev) => {
             if (prev <= 1) {
-              // Wim Hof session completed!
               completeSession();
               return 0;
             }
@@ -124,7 +117,7 @@ export const BreathingView: React.FC = () => {
         return;
       }
 
-      // Standard 4-step / 3-step flows
+      // Standard flows
       setTotalSecondsLeft((total) => {
         if (total <= 1) {
           completeSession();
@@ -159,7 +152,6 @@ export const BreathingView: React.FC = () => {
       completedAt: new Date().toISOString()
     });
 
-    await addXpAndGold(BREATHING_SESSION_REWARD.xp, BREATHING_SESSION_REWARD.gold);
     setIsCompletedModalOpen(true);
   };
 

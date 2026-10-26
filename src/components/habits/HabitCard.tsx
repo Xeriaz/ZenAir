@@ -5,8 +5,8 @@ import type { Habit, HabitLog } from '../../types';
 interface HabitCardProps {
   habit: Habit;
   log?: HabitLog;
-  onToggleDaily: (habitId: number) => Promise<{ completed: boolean; leveledUp: boolean }>;
-  onCounter: (habitId: number, isPositive: boolean) => Promise<{ count: number; leveledUp: boolean }>;
+  onToggleDaily: (habitId: number) => Promise<{ completed: boolean } | void>;
+  onCounter: (habitId: number, isPositive: boolean) => Promise<{ count: number } | void>;
   onEdit: (habit: Habit) => void;
   onDelete: (habitId: number) => void;
 }
@@ -26,10 +26,13 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   const count = log?.count ?? 0;
 
   const handleToggle = async () => {
-    if (!habit.id) return;
+    if (!habit.id || animating) return;
     setAnimating(true);
-    await onToggleDaily(habit.id);
-    setTimeout(() => setAnimating(false), 300);
+    try {
+      await onToggleDaily(habit.id);
+    } finally {
+      setTimeout(() => setAnimating(false), 250);
+    }
   };
 
   const handleCount = async (isPositive: boolean) => {
@@ -64,8 +67,10 @@ export const HabitCard: React.FC<HabitCardProps> = ({
         {habit.type === 'daily' ? (
           <button
             onClick={handleToggle}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
-              animating ? 'scale-115' : 'active:scale-95'
+            disabled={animating}
+            aria-label={`Toggle ${habit.title}`}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer disabled:cursor-not-allowed ${
+              animating ? 'scale-115 opacity-80' : 'active:scale-95'
             } ${
               isCompleted
                 ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-400/30'

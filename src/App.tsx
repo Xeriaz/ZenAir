@@ -1,12 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Header } from './components/common/Header';
 import { BottomNav, type NavTab } from './components/common/BottomNav';
 import { HabitList } from './components/habits/HabitList';
 import { TaskTimeline } from './components/tasks/TaskTimeline';
-import { BreathingView } from './components/breathing/BreathingView';
-import { AnalyticsView } from './components/analytics/AnalyticsView';
-import { SettingsView } from './components/settings/SettingsView';
 import { initializeDatabase } from './db/db';
+
+const BreathingView = lazy(() =>
+  import('./components/breathing/BreathingView').then((m) => ({ default: m.BreathingView }))
+);
+const AnalyticsView = lazy(() =>
+  import('./components/analytics/AnalyticsView').then((m) => ({ default: m.AnalyticsView }))
+);
+const SettingsView = lazy(() =>
+  import('./components/settings/SettingsView').then((m) => ({ default: m.SettingsView }))
+);
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('habits');
@@ -34,19 +41,28 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans pb-safe">
-      {/* Fixed iOS Safe Area Status Bar Solid Plate (prevents WebKit progressive blur overlay) */}
-      <div className="ios-status-plate" aria-hidden="true" />
-
-      {/* Gamification Header */}
+      {/* Brand Header */}
       <Header />
 
       {/* Main Content Area */}
       <main className="flex-1 w-full">
         {currentTab === 'habits' && <HabitList />}
         {currentTab === 'tasks' && <TaskTimeline />}
-        {currentTab === 'breathing' && <BreathingView />}
-        {currentTab === 'analytics' && <AnalyticsView />}
-        {currentTab === 'settings' && <SettingsView />}
+        {currentTab === 'breathing' && (
+          <Suspense fallback={<div className="text-center py-24 text-xs text-slate-500">Loading Breathing Guide...</div>}>
+            <BreathingView />
+          </Suspense>
+        )}
+        {currentTab === 'analytics' && (
+          <Suspense fallback={<div className="text-center py-24 text-xs text-slate-500">Loading Analytics...</div>}>
+            <AnalyticsView />
+          </Suspense>
+        )}
+        {currentTab === 'settings' && (
+          <Suspense fallback={<div className="text-center py-24 text-xs text-slate-500">Loading Settings...</div>}>
+            <SettingsView />
+          </Suspense>
+        )}
       </main>
 
       {/* iOS Safe Area Compliant Bottom Navigation */}
