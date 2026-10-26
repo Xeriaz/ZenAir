@@ -69,7 +69,7 @@ export const AnalyticsView: React.FC = () => {
     };
   });
 
-  // Time-of-day distribution
+  // Habit distribution by time of day
   const timeDistribution = [
     { name: 'Morning', count: 0, color: '#38bdf8' },
     { name: 'Afternoon', count: 0, color: '#818cf8' },
@@ -84,9 +84,9 @@ export const AnalyticsView: React.FC = () => {
 
   // Difficulty radar data
   const difficultyData = [
-    { level: 'Easy', count: activeHabits.filter(h => h.difficulty === 'easy').length },
-    { level: 'Medium', count: activeHabits.filter(h => h.difficulty === 'medium').length },
-    { level: 'Hard', count: activeHabits.filter(h => h.difficulty === 'hard').length },
+    { difficulty: 'Easy', count: activeHabits.filter(h => h.difficulty === 'easy').length, color: '#34d399' },
+    { difficulty: 'Medium', count: activeHabits.filter(h => h.difficulty === 'medium').length, color: '#fbbf24' },
+    { difficulty: 'Hard', count: activeHabits.filter(h => h.difficulty === 'hard').length, color: '#f87171' },
   ];
 
   // 90-Day Heatmap calculations
@@ -256,11 +256,19 @@ export const AnalyticsView: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={difficultyData}>
                 <PolarGrid stroke="#334155" />
-                <PolarAngleAxis dataKey="level" stroke="#94a3b8" fontSize={11} />
-                <PolarRadiusAxis stroke="#475569" fontSize={9} />
+                <PolarAngleAxis dataKey="difficulty" stroke="#94a3b8" fontSize={11} />
+                <PolarRadiusAxis tick={false} axisLine={false} />
                 <Radar name="Count" dataKey="count" stroke="#818cf8" fill="#818cf8" fillOpacity={0.4} />
               </RadarChart>
             </ResponsiveContainer>
+          </div>
+          <div className="grid grid-cols-3 gap-1 text-[11px] text-slate-300 pt-1 text-center">
+            {difficultyData.map((d) => (
+              <div key={d.difficulty} className="flex items-center justify-center gap-1.5">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
+                <span>{d.difficulty}: <strong>{d.count}</strong></span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
