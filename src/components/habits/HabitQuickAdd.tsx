@@ -48,7 +48,7 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md shadow-black/20 flex flex-col gap-2.5"
+      className="bg-[#160e29]/90 border border-purple-900/50 rounded-2xl p-3 shadow-md shadow-black/30 flex flex-col gap-2.5"
     >
       <div className="flex items-center gap-2">
         <input
@@ -56,12 +56,12 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Quick add habit (e.g., Morning 10-min meditation)..."
-          className="flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/70 focus:ring-1 focus:ring-cyan-500/50 transition"
+          className="flex-1 bg-[#10091d]/90 border border-purple-900/50 rounded-xl px-3.5 py-2 text-sm text-purple-100 placeholder:text-purple-400/50 focus:outline-none focus:border-purple-500/70 focus:ring-1 focus:ring-purple-500/50 transition"
         />
         <button
           type="submit"
           disabled={!title.trim() || isSubmitting}
-          className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium text-xs px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-md shadow-cyan-500/20 cursor-pointer"
+          className="bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-400 hover:to-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium text-xs px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-md shadow-purple-500/20 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Add</span>
@@ -71,7 +71,7 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
       {/* Inline Quick Filters */}
       <div className="flex flex-wrap items-center justify-between gap-1.5 pt-0.5 text-xs">
         {/* Time of Day selection */}
-        <div className="flex items-center bg-slate-950/60 p-0.5 rounded-lg border border-slate-800/80">
+        <div className="flex items-center bg-[#10091d]/70 p-0.5 rounded-lg border border-purple-900/50">
           {timeOptions.map((opt) => {
             const Icon = opt.icon;
             const isSelected = timeOfDay === opt.id;
@@ -82,11 +82,11 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
                 onClick={() => setTimeOfDay(opt.id)}
                 className={`flex items-center gap-1 px-2 py-1 rounded-md transition text-[11px] cursor-pointer ${
                   isSelected
-                    ? 'bg-cyan-500/20 text-cyan-300 font-semibold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-purple-500/25 text-purple-300 font-semibold'
+                    : 'text-purple-300/60 hover:text-purple-100'
                 }`}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className="w-3.5 h-3.5" />
                 <span>{opt.label}</span>
               </button>
             );
@@ -98,7 +98,7 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
           <select
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value as HabitDifficulty)}
-            className="bg-slate-950/80 border border-slate-800 text-slate-300 rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-cyan-500 cursor-pointer"
+            className="bg-[#10091d]/90 border border-purple-900/50 text-purple-200 rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-purple-500 cursor-pointer"
           >
             <option value="easy">Easy (+10 XP)</option>
             <option value="medium">Medium (+20 XP)</option>
@@ -110,8 +110,8 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
             onClick={() => setType(type === 'daily' ? 'positive_negative' : 'daily')}
             className={`px-2 py-1 rounded-lg border text-[11px] font-medium transition cursor-pointer ${
               type === 'daily'
-                ? 'bg-slate-800 border-slate-700 text-slate-300'
-                : 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                ? 'bg-purple-950/70 border-purple-800/60 text-purple-300'
+                : 'bg-fuchsia-500/20 border-fuchsia-500/40 text-fuchsia-300'
             }`}
           >
             {type === 'daily' ? 'Daily' : '+ / - Counter'}
@@ -121,7 +121,7 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
             type="button"
             onClick={onOpenAdvanced}
             title="More Options"
-            className="p-1 text-slate-400 hover:text-slate-200 transition rounded-lg hover:bg-slate-800 cursor-pointer"
+            className="p-1 text-purple-300/70 hover:text-purple-100 transition rounded-lg hover:bg-purple-900/30 cursor-pointer"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
           </button>

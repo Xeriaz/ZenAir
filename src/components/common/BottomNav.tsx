@@ -18,7 +18,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onTabChange })
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#090d16]/95 backdrop-blur-lg border-t border-slate-800/80 bottom-nav-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#0b0714]/95 backdrop-blur-lg border-t border-purple-900/40 bottom-nav-safe">
       <div className="max-w-md mx-auto grid grid-cols-5 px-1 pt-1.5 pb-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -30,13 +30,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onTabChange })
               onClick={() => onTabChange(tab.id)}
               className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer ${
                 isActive
-                  ? 'text-cyan-400 font-medium scale-105'
-                  : 'text-slate-400 hover:text-slate-200 active:scale-95'
+                  ? 'text-purple-400 font-medium scale-105'
+                  : 'text-purple-300/60 hover:text-purple-100 active:scale-95'
               }`}
             >
               <div
                 className={`p-1 rounded-lg transition-colors ${
-                  isActive ? 'bg-cyan-500/15' : 'bg-transparent'
+                  isActive ? 'bg-purple-500/15' : 'bg-transparent'
                 }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />

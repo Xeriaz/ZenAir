@@ -53,10 +53,10 @@ export const HabitCard: React.FC<HabitCardProps> = ({
 
   return (
     <div
-      className={`relative group bg-slate-900/80 border transition-all duration-200 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-sm ${
+      className={`relative group bg-[#160e29]/90 border transition-all duration-200 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-sm ${
         isCompleted
-          ? 'border-emerald-500/40 bg-slate-900/40'
-          : 'border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+          ? 'border-emerald-500/40 bg-[#160e29]/50'
+          : 'border-purple-900/40 hover:border-purple-700/60 hover:bg-[#1a1130]'
       }`}
     >
       {/* Left section: Checkbox or Counter & Title */}
@@ -69,13 +69,13 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             } ${
               isCompleted
                 ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-400/30'
-                : 'bg-slate-950/80 border-2 border-slate-700 hover:border-cyan-400 text-transparent'
+                : 'bg-[#10091d] border-2 border-purple-800/60 hover:border-purple-400 text-transparent'
             }`}
           >
             <Check className={`w-5 h-5 stroke-[3px] transition-transform ${isCompleted ? 'scale-100' : 'scale-50'}`} />
           </button>
         ) : (
-          <div className="flex items-center gap-1.5 shrink-0 bg-slate-950/70 p-1 rounded-xl border border-slate-800">
+          <div className="flex items-center gap-1.5 shrink-0 bg-[#10091d]/80 p-1 rounded-xl border border-purple-900/50">
             <button
               onClick={() => handleCount(false)}
               title="Deduct XP"
@@ -83,7 +83,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="w-6 text-center font-bold text-xs text-slate-200">{count}</span>
+            <span className="w-6 text-center font-bold text-xs text-purple-100">{count}</span>
             <button
               onClick={() => handleCount(true)}
               title="Earn XP"
@@ -99,7 +99,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
           <div className="flex items-center gap-2">
             <span
               className={`text-sm font-semibold truncate transition-colors ${
-                isCompleted ? 'text-slate-400 line-through' : 'text-slate-100'
+                isCompleted ? 'text-purple-400/50 line-through' : 'text-purple-100'
               }`}
             >
               {habit.title}
@@ -108,9 +108,9 @@ export const HabitCard: React.FC<HabitCardProps> = ({
 
           <div className="flex flex-wrap items-center gap-1.5 mt-1 text-[11px]">
             {/* Time of day pill */}
-            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-800/80 text-slate-400 capitalize">
+            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-950/60 text-purple-300/80 capitalize">
               <TimeIcon className="w-2.5 h-2.5" />
-              {habit.scheduledTime ? `${habit.timeOfDay} • ${habit.scheduledTime}` : habit.timeOfDay}
+              {habit.scheduledTime ? `${habit.timeOfDay} \u2022 ${habit.scheduledTime}` : habit.timeOfDay}
             </span>
 
             {/* Difficulty badge */}
@@ -131,7 +131,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
       <div className="relative shrink-0">
         <button
           onClick={() => setShowMenu(!showMenu)}
-          className="p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+          className="p-1.5 text-purple-300/70 hover:text-purple-100 rounded-lg hover:bg-purple-900/30 transition cursor-pointer"
         >
           <MoreVertical className="w-4 h-4" />
         </button>
@@ -139,15 +139,15 @@ export const HabitCard: React.FC<HabitCardProps> = ({
         {showMenu && (
           <>
             <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-            <div className="absolute right-0 top-8 z-50 w-32 bg-slate-900 border border-slate-700/80 rounded-xl shadow-xl shadow-black/50 py-1 flex flex-col text-xs">
+            <div className="absolute right-0 top-8 z-50 w-32 bg-[#18102d] border border-purple-800/80 rounded-xl shadow-xl shadow-black/60 py-1 flex flex-col text-xs">
               <button
                 onClick={() => {
                   setShowMenu(false);
                   onEdit(habit);
                 }}
-                className="flex items-center gap-2 px-3 py-2 text-slate-300 hover:bg-slate-800 transition text-left cursor-pointer"
+                className="flex items-center gap-2 px-3 py-2 text-purple-200 hover:bg-purple-900/40 transition text-left cursor-pointer"
               >
-                <Edit2 className="w-3.5 h-3.5 text-cyan-400" />
+                <Edit2 className="w-3.5 h-3.5 text-purple-400" />
                 <span>Edit</span>
               </button>
               <button

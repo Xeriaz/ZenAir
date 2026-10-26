@@ -66,12 +66,12 @@ export const AnalyticsView: React.FC = () => {
     };
   });
 
-  // Time-of-day distribution
+  // Time-of-day distribution with rich purple / violet palette
   const timeDistribution = [
-    { name: 'Morning', count: 0, color: '#38bdf8' },
-    { name: 'Afternoon', count: 0, color: '#818cf8' },
-    { name: 'Evening', count: 0, color: '#c084fc' },
-    { name: 'Anytime', count: 0, color: '#34d399' }
+    { name: 'Morning', count: 0, color: '#c084fc' },
+    { name: 'Afternoon', count: 0, color: '#a855f7' },
+    { name: 'Evening', count: 0, color: '#7e22ce' },
+    { name: 'Anytime', count: 0, color: '#e879f9' }
   ];
 
   activeHabits.forEach((h) => {
@@ -90,11 +90,11 @@ export const AnalyticsView: React.FC = () => {
   const heatmapDates = get90DayGridDates();
   const getIntensityClass = (dateStr: string) => {
     const data = logsByDate.get(dateStr);
-    if (!data || data.count === 0) return 'bg-slate-800/60 border-slate-700/30';
-    if (data.count === 1) return 'bg-cyan-950 border-cyan-800 text-cyan-400';
-    if (data.count === 2) return 'bg-cyan-700/80 border-cyan-600 text-white';
-    if (data.count >= 3) return 'bg-cyan-400 border-cyan-300 text-slate-950 font-bold';
-    return 'bg-slate-800/60';
+    if (!data || data.count === 0) return 'bg-purple-950/40 border-purple-900/30';
+    if (data.count === 1) return 'bg-purple-950 border-purple-800 text-purple-300';
+    if (data.count === 2) return 'bg-purple-700/80 border-purple-600 text-white';
+    if (data.count >= 3) return 'bg-purple-400 border-purple-300 text-purple-950 font-bold';
+    return 'bg-purple-950/40';
   };
 
   // High-level metrics
@@ -108,46 +108,46 @@ export const AnalyticsView: React.FC = () => {
     <div className="flex flex-col gap-5 max-w-2xl mx-auto px-4 pt-3 pb-8">
       {/* Metrics Row */}
       <div className="grid grid-cols-3 gap-2.5">
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
-          <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
+        <div className="bg-[#160e29]/90 border border-purple-900/40 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
+          <div className="flex items-center gap-1.5 text-purple-300/70 text-[11px] font-medium">
             <Flame className="w-3.5 h-3.5 text-amber-400" />
             <span>Habits Done</span>
           </div>
           <span className="text-xl font-bold text-white tracking-tight">{totalCompletedHabits}</span>
         </div>
 
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
-          <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
-            <Award className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="bg-[#160e29]/90 border border-purple-900/40 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
+          <div className="flex items-center gap-1.5 text-purple-300/70 text-[11px] font-medium">
+            <Award className="w-3.5 h-3.5 text-purple-400" />
             <span>Total XP</span>
           </div>
-          <span className="text-xl font-bold text-cyan-300 tracking-tight">{totalXpEarned}</span>
+          <span className="text-xl font-bold text-purple-300 tracking-tight">{totalXpEarned}</span>
         </div>
 
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
-          <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
-            <Wind className="w-3.5 h-3.5 text-indigo-400" />
+        <div className="bg-[#160e29]/90 border border-purple-900/40 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
+          <div className="flex items-center gap-1.5 text-purple-300/70 text-[11px] font-medium">
+            <Wind className="w-3.5 h-3.5 text-fuchsia-400" />
             <span>Calm Time</span>
           </div>
-          <span className="text-xl font-bold text-indigo-300 tracking-tight">{totalBreathingMinutes}m</span>
+          <span className="text-xl font-bold text-fuchsia-300 tracking-tight">{totalBreathingMinutes}m</span>
         </div>
       </div>
 
       {/* Completion & XP Diagram */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
+      <div className="bg-[#160e29]/90 border border-purple-900/40 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-cyan-400" />
+            <BarChart3 className="w-4 h-4 text-purple-400" />
             <h3 className="text-sm font-bold text-white tracking-tight">Consistency & Completion</h3>
           </div>
 
-          <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+          <div className="flex items-center bg-[#10091d] p-0.5 rounded-lg border border-purple-900/50">
             <button
               onClick={() => setTimeRange('7')}
               className={`px-2.5 py-1 text-xs rounded-md font-medium transition cursor-pointer ${
                 timeRange === '7'
-                  ? 'bg-cyan-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-purple-500 text-white font-bold'
+                  : 'text-purple-300/60 hover:text-purple-100'
               }`}
             >
               7 Days
@@ -156,8 +156,8 @@ export const AnalyticsView: React.FC = () => {
               onClick={() => setTimeRange('30')}
               className={`px-2.5 py-1 text-xs rounded-md font-medium transition cursor-pointer ${
                 timeRange === '30'
-                  ? 'bg-cyan-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-purple-500 text-white font-bold'
+                  : 'text-purple-300/60 hover:text-purple-100'
               }`}
             >
               30 Days
@@ -169,22 +169,22 @@ export const AnalyticsView: React.FC = () => {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
               <defs>
-                <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.6} />
-                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#a855f7" stopOpacity={0.6} />
+                  <stop offset="95%" stopColor="#a855f7" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" stroke="#64748b" fontSize={10} tickLine={false} />
-              <YAxis stroke="#64748b" fontSize={10} tickLine={false} domain={[0, 100]} />
+              <XAxis dataKey="date" stroke="#9333ea" fontSize={10} tickLine={false} />
+              <YAxis stroke="#9333ea" fontSize={10} tickLine={false} domain={[0, 100]} />
               <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
-                      <div className="bg-slate-900 border border-slate-700 p-2.5 rounded-xl shadow-xl text-xs flex flex-col gap-1">
-                        <span className="font-semibold text-slate-200">{formatReadableDate(data.fullDate)}</span>
-                        <span className="text-cyan-400 font-medium">Completion: {data.completionRate}%</span>
-                        <span className="text-indigo-300">XP Earned: {data.xp}</span>
+                      <div className="bg-[#18102d] border border-purple-800/70 p-2.5 rounded-xl shadow-xl text-xs flex flex-col gap-1">
+                        <span className="font-semibold text-purple-100">{formatReadableDate(data.fullDate)}</span>
+                        <span className="text-purple-400 font-medium">Completion: {data.completionRate}%</span>
+                        <span className="text-fuchsia-300">XP Earned: {data.xp}</span>
                       </div>
                     );
                   }
@@ -194,10 +194,10 @@ export const AnalyticsView: React.FC = () => {
               <Area
                 type="monotone"
                 dataKey="completionRate"
-                stroke="#06b6d4"
+                stroke="#c084fc"
                 strokeWidth={2.5}
                 fillOpacity={1}
-                fill="url(#cyanGradient)"
+                fill="url(#purpleGradient)"
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -207,9 +207,9 @@ export const AnalyticsView: React.FC = () => {
       {/* Distribution Diagrams */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Time of Day Balance */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-2 shadow-sm">
+        <div className="bg-[#160e29]/90 border border-purple-900/40 rounded-3xl p-4 flex flex-col gap-2 shadow-sm">
           <div className="flex items-center gap-2">
-            <PieIcon className="w-4 h-4 text-cyan-400" />
+            <PieIcon className="w-4 h-4 text-purple-400" />
             <h3 className="text-sm font-bold text-white tracking-tight">Time-of-Day Habits</h3>
           </div>
           <div className="h-40 w-full flex items-center justify-center">
@@ -233,7 +233,7 @@ export const AnalyticsView: React.FC = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 pt-1">
+          <div className="grid grid-cols-2 gap-2 text-[11px] text-purple-200 pt-1">
             {timeDistribution.map((t) => (
               <div key={t.name} className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: t.color }} />
@@ -244,18 +244,18 @@ export const AnalyticsView: React.FC = () => {
         </div>
 
         {/* Difficulty Breakdown Radar */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-2 shadow-sm">
+        <div className="bg-[#160e29]/90 border border-purple-900/40 rounded-3xl p-4 flex flex-col gap-2 shadow-sm">
           <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-indigo-400" />
+            <Award className="w-4 h-4 text-violet-400" />
             <h3 className="text-sm font-bold text-white tracking-tight">Difficulty Balance</h3>
           </div>
           <div className="h-40 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={difficultyData}>
-                <PolarGrid stroke="#334155" />
-                <PolarAngleAxis dataKey="level" stroke="#94a3b8" fontSize={11} />
-                <PolarRadiusAxis stroke="#475569" fontSize={9} />
-                <Radar name="Count" dataKey="count" stroke="#818cf8" fill="#818cf8" fillOpacity={0.4} />
+                <PolarGrid stroke="#3b255e" />
+                <PolarAngleAxis dataKey="level" stroke="#c4b5fd" fontSize={11} />
+                <PolarRadiusAxis stroke="#6b21a8" fontSize={9} />
+                <Radar name="Count" dataKey="count" stroke="#a855f7" fill="#a855f7" fillOpacity={0.4} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -263,13 +263,13 @@ export const AnalyticsView: React.FC = () => {
       </div>
 
       {/* 90-Day Consistency Heatmap */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
+      <div className="bg-[#160e29]/90 border border-purple-900/40 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-cyan-400" />
+            <Calendar className="w-4 h-4 text-purple-400" />
             <h3 className="text-sm font-bold text-white tracking-tight">90-Day Consistency Grid</h3>
           </div>
-          <span className="text-[11px] text-slate-400">Past 3 Months</span>
+          <span className="text-[11px] text-purple-300/70">Past 3 Months</span>
         </div>
 
         <div className="overflow-x-auto pb-2">
@@ -287,12 +287,12 @@ export const AnalyticsView: React.FC = () => {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-end gap-1.5 text-[11px] text-slate-400">
+        <div className="flex items-center justify-end gap-1.5 text-[11px] text-purple-300/70">
           <span>Less</span>
-          <span className="w-3 h-3 rounded-sm bg-slate-800 border border-slate-700/50" />
-          <span className="w-3 h-3 rounded-sm bg-cyan-950 border border-cyan-800" />
-          <span className="w-3 h-3 rounded-sm bg-cyan-700/80 border border-cyan-600" />
-          <span className="w-3 h-3 rounded-sm bg-cyan-400 border border-cyan-300" />
+          <span className="w-3 h-3 rounded-sm bg-purple-950/40 border border-purple-900/30" />
+          <span className="w-3 h-3 rounded-sm bg-purple-950 border border-purple-800" />
+          <span className="w-3 h-3 rounded-sm bg-purple-700/80 border border-purple-600" />
+          <span className="w-3 h-3 rounded-sm bg-purple-400 border border-purple-300" />
           <span>More</span>
         </div>
       </div>
