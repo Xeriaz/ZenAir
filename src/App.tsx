@@ -34,6 +34,9 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans pb-safe">
+      {/* Fixed iOS Safe Area Status Bar Solid Plate (prevents WebKit progressive blur overlay) */}
+      <div className="ios-status-plate" aria-hidden="true" />
+
       {/* Gamification Header */}
       <Header />
 

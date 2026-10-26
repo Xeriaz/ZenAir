@@ -43,6 +43,19 @@
   padding-bottom: max(env(safe-area-inset-bottom, 12px), 12px);
 }
 
+/* iOS PWA Status Bar Solid Anchor (Disables WebKit top-edge progressive blur) */
+.ios-status-plate {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: max(env(safe-area-inset-top, 0px), 16px);
+  background-color: #090d16;
+  z-index: 9999;
+  pointer-events: none;
+}
+
 /* 60fps Hardware-Accelerated Breathing Animations */
 @keyframes breathe-expand {
   0% {
