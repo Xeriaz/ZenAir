@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Flame, Plus, Minus, MoreVertical, Edit2, Trash2, Sun, Sunset, Moon, Sparkles } from 'lucide-react';
 import type { Habit, HabitLog } from '../../types';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 interface HabitCardProps {
   habit: Habit;
@@ -19,6 +20,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   onEdit,
   onDelete
 }) => {
+  const { t, language } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const [animating, setAnimating] = useState(false);
 
@@ -46,6 +48,19 @@ export const HabitCard: React.FC<HabitCardProps> = ({
     hard: 'text-rose-400 bg-rose-500/10 border-rose-500/25'
   };
 
+  const difficultyLabels = {
+    easy: t.habits.difficultyEasy,
+    medium: t.habits.difficultyMedium,
+    hard: t.habits.difficultyHard
+  };
+
+  const timeLabels = {
+    morning: t.habits.morning,
+    afternoon: t.habits.afternoon,
+    evening: t.habits.evening,
+    anytime: t.habits.anytime
+  };
+
   const timeIcons = {
     morning: Sun,
     afternoon: Sunset,
@@ -53,6 +68,13 @@ export const HabitCard: React.FC<HabitCardProps> = ({
     anytime: Sparkles
   };
   const TimeIcon = timeIcons[habit.timeOfDay] || Sparkles;
+
+  const formatStreak = (streak: number) => {
+    if (language === 'lt') {
+      return `${streak} d.`;
+    }
+    return `${streak} ${streak === 1 ? 'day' : 'days'}`;
+  };
 
   return (
     <div
@@ -115,18 +137,18 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             {/* Time of day pill */}
             <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-800/80 text-slate-400 capitalize">
               <TimeIcon className="w-2.5 h-2.5" />
-              {habit.scheduledTime ? `${habit.timeOfDay} • ${habit.scheduledTime}` : habit.timeOfDay}
+              {habit.scheduledTime ? `${timeLabels[habit.timeOfDay]} • ${habit.scheduledTime}` : timeLabels[habit.timeOfDay]}
             </span>
 
             {/* Difficulty badge */}
             <span className={`px-1.5 py-0.5 rounded-md border font-medium capitalize ${difficultyColors[habit.difficulty]}`}>
-              {habit.difficulty}
+              {difficultyLabels[habit.difficulty]}
             </span>
 
             {/* Streak count */}
             <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
               <Flame className="w-3 h-3 fill-amber-400/20" />
-              {habit.streak} {habit.streak === 1 ? 'day' : 'days'}
+              {formatStreak(habit.streak)}
             </span>
           </div>
         </div>
@@ -153,17 +175,19 @@ export const HabitCard: React.FC<HabitCardProps> = ({
                 className="flex items-center gap-2 px-3 py-2 text-slate-300 hover:bg-slate-800 transition text-left cursor-pointer"
               >
                 <Edit2 className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Edit</span>
+                <span>{t.common.edit}</span>
               </button>
               <button
                 onClick={() => {
                   setShowMenu(false);
-                  if (habit.id) onDelete(habit.id);
+                  if (window.confirm(t.habits.deleteConfirm)) {
+                    if (habit.id) onDelete(habit.id);
+                  }
                 }}
                 className="flex items-center gap-2 px-3 py-2 text-rose-400 hover:bg-rose-500/10 transition text-left cursor-pointer"
               >
-                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-                <span>Delete</span>
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{t.common.delete}</span>
               </button>
             </div>
           </>

@@ -19,8 +19,10 @@ import {
 import { BarChart3, PieChart as PieIcon, Flame, Calendar, Award, Wind, CheckCircle2 } from 'lucide-react';
 import { db } from '../../db/db';
 import { getLastNDaysDateStrings, get90DayGridDates, formatReadableDate } from '../../utils/dates';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 export const AnalyticsView: React.FC = () => {
+  const { t, language } = useTranslation();
   const [timeRange, setTimeRange] = useState<'7' | '30'>('7');
 
   const habits = useLiveQuery(async () => {
@@ -71,22 +73,22 @@ export const AnalyticsView: React.FC = () => {
 
   // Habit distribution by time of day
   const timeDistribution = [
-    { name: 'Morning', count: 0, color: '#38bdf8' },
-    { name: 'Afternoon', count: 0, color: '#818cf8' },
-    { name: 'Evening', count: 0, color: '#c084fc' },
-    { name: 'Anytime', count: 0, color: '#34d399' }
+    { name: t.analytics.timeMorning, count: 0, color: '#38bdf8', key: 'morning' },
+    { name: t.analytics.timeAfternoon, count: 0, color: '#818cf8', key: 'afternoon' },
+    { name: t.analytics.timeEvening, count: 0, color: '#c084fc', key: 'evening' },
+    { name: t.analytics.timeAnytime, count: 0, color: '#34d399', key: 'anytime' }
   ];
 
   activeHabits.forEach((h) => {
-    const item = timeDistribution.find((t) => t.name.toLowerCase() === h.timeOfDay);
+    const item = timeDistribution.find((item) => item.key === h.timeOfDay);
     if (item) item.count += 1;
   });
 
   // Difficulty radar data
   const difficultyData = [
-    { difficulty: 'Easy', count: activeHabits.filter(h => h.difficulty === 'easy').length, color: '#34d399' },
-    { difficulty: 'Medium', count: activeHabits.filter(h => h.difficulty === 'medium').length, color: '#fbbf24' },
-    { difficulty: 'Hard', count: activeHabits.filter(h => h.difficulty === 'hard').length, color: '#f87171' },
+    { difficulty: t.analytics.diffEasy, count: activeHabits.filter(h => h.difficulty === 'easy').length, color: '#34d399' },
+    { difficulty: t.analytics.diffMedium, count: activeHabits.filter(h => h.difficulty === 'medium').length, color: '#fbbf24' },
+    { difficulty: t.analytics.diffHard, count: activeHabits.filter(h => h.difficulty === 'hard').length, color: '#f87171' },
   ];
 
   // 90-Day Heatmap calculations
@@ -114,7 +116,7 @@ export const AnalyticsView: React.FC = () => {
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
           <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
             <Flame className="w-3.5 h-3.5 text-amber-400" />
-            <span>Habits Done</span>
+            <span>{t.analytics.habitsDone}</span>
           </div>
           <span className="text-xl font-bold text-white tracking-tight">{totalCompletedHabits}</span>
         </div>
@@ -122,7 +124,7 @@ export const AnalyticsView: React.FC = () => {
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
           <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
             <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Tasks Done</span>
+            <span>{t.analytics.tasksDone}</span>
           </div>
           <span className="text-xl font-bold text-cyan-300 tracking-tight">{totalCompletedTasks}</span>
         </div>
@@ -130,7 +132,7 @@ export const AnalyticsView: React.FC = () => {
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
           <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
             <Wind className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Calm Time</span>
+            <span>{t.analytics.calmTime}</span>
           </div>
           <span className="text-xl font-bold text-indigo-300 tracking-tight">{totalBreathingMinutes}m</span>
         </div>
@@ -141,7 +143,7 @@ export const AnalyticsView: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-sm font-bold text-white tracking-tight">Consistency & Completion</h3>
+            <h3 className="text-sm font-bold text-white tracking-tight">{t.analytics.consistencyAndCompletion}</h3>
           </div>
 
           <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800">
@@ -153,7 +155,7 @@ export const AnalyticsView: React.FC = () => {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              7 Days
+              {t.analytics.days7}
             </button>
             <button
               onClick={() => setTimeRange('30')}
@@ -163,7 +165,7 @@ export const AnalyticsView: React.FC = () => {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              30 Days
+              {t.analytics.days30}
             </button>
           </div>
         </div>
@@ -185,9 +187,9 @@ export const AnalyticsView: React.FC = () => {
                     const data = payload[0].payload;
                     return (
                       <div className="bg-slate-900 border border-slate-700 p-2.5 rounded-xl shadow-xl text-xs flex flex-col gap-1">
-                        <span className="font-semibold text-slate-200">{formatReadableDate(data.fullDate)}</span>
-                        <span className="text-cyan-400 font-medium">Completion: {data.completionRate}%</span>
-                        <span className="text-indigo-300">Habits Done: {data.completedHabits}</span>
+                        <span className="font-semibold text-slate-200">{formatReadableDate(data.fullDate, language)}</span>
+                        <span className="text-cyan-400 font-medium">{t.analytics.completion}: {data.completionRate}%</span>
+                        <span className="text-indigo-300">{t.analytics.habitsDoneTooltip}: {data.completedHabits}</span>
                       </div>
                     );
                   }
@@ -213,7 +215,7 @@ export const AnalyticsView: React.FC = () => {
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-2 shadow-sm">
           <div className="flex items-center gap-2">
             <PieIcon className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-sm font-bold text-white tracking-tight">Time-of-Day Habits</h3>
+            <h3 className="text-sm font-bold text-white tracking-tight">{t.analytics.timeOfDayHabits}</h3>
           </div>
           <div className="h-40 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -237,10 +239,10 @@ export const AnalyticsView: React.FC = () => {
             </ResponsiveContainer>
           </div>
           <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 pt-1">
-            {timeDistribution.map((t) => (
-              <div key={t.name} className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: t.color }} />
-                <span>{t.name}: <strong>{t.count}</strong></span>
+            {timeDistribution.map((tItem) => (
+              <div key={tItem.name} className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tItem.color }} />
+                <span>{tItem.name}: <strong>{tItem.count}</strong></span>
               </div>
             ))}
           </div>
@@ -250,7 +252,7 @@ export const AnalyticsView: React.FC = () => {
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-2 shadow-sm">
           <div className="flex items-center gap-2">
             <Award className="w-4 h-4 text-indigo-400" />
-            <h3 className="text-sm font-bold text-white tracking-tight">Difficulty Balance</h3>
+            <h3 className="text-sm font-bold text-white tracking-tight">{t.analytics.difficultyBalance}</h3>
           </div>
           <div className="h-40 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -278,9 +280,9 @@ export const AnalyticsView: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-sm font-bold text-white tracking-tight">90-Day Consistency Grid</h3>
+            <h3 className="text-sm font-bold text-white tracking-tight">{t.analytics.consistencyGrid}</h3>
           </div>
-          <span className="text-[11px] text-slate-400">Past 3 Months</span>
+          <span className="text-[11px] text-slate-400">{t.analytics.past3Months}</span>
         </div>
 
         <div className="overflow-x-auto pb-2">
@@ -288,7 +290,7 @@ export const AnalyticsView: React.FC = () => {
             {heatmapDates.map((item) => (
               <div
                 key={item.dateStr}
-                title={`${formatReadableDate(item.dateStr)}: ${logsByDate.get(item.dateStr)?.count || 0} completed`}
+                title={`${formatReadableDate(item.dateStr, language)}: ${logsByDate.get(item.dateStr)?.count || 0} ${t.analytics.completedLegend}`}
                 className={`w-3.5 h-3.5 rounded-sm border transition-colors cursor-pointer ${getIntensityClass(
                   item.dateStr
                 )}`}
@@ -299,12 +301,12 @@ export const AnalyticsView: React.FC = () => {
 
         {/* Legend */}
         <div className="flex items-center justify-end gap-1.5 text-[11px] text-slate-400">
-          <span>Less</span>
+          <span>{t.analytics.less}</span>
           <span className="w-3 h-3 rounded-sm bg-slate-800 border border-slate-700/50" />
           <span className="w-3 h-3 rounded-sm bg-cyan-950 border border-cyan-800" />
           <span className="w-3 h-3 rounded-sm bg-cyan-700/80 border border-cyan-600" />
           <span className="w-3 h-3 rounded-sm bg-cyan-400 border border-cyan-300" />
-          <span>More</span>
+          <span>{t.analytics.more}</span>
         </div>
       </div>
     </div>

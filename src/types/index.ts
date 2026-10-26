@@ -50,6 +50,7 @@ export interface UserProfile {
   defaultBreathingId: string;
   preferredSessionMinutes: number;
   theme: 'dark' | 'light';
+  language?: 'en' | 'lt';
 }
 
 export type BreathingExerciseId = 'box' | 'relax_478' | 'wim_hof' | 'coherent_55' | 'physio_sigh';

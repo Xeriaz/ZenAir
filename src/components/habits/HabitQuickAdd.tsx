@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Sun, Sunset, Moon, Sparkles, SlidersHorizontal } from 'lucide-react';
 import type { HabitDifficulty, HabitType, TimeOfDay } from '../../types';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 interface HabitQuickAddProps {
   onAdd: (data: {
@@ -14,6 +15,7 @@ interface HabitQuickAddProps {
 }
 
 export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvanced }) => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('morning');
   const [difficulty, setDifficulty] = useState<HabitDifficulty>('easy');
@@ -39,10 +41,10 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
   };
 
   const timeOptions: { id: TimeOfDay; label: string; icon: React.FC<{ className?: string }> }[] = [
-    { id: 'morning', label: 'Morn', icon: Sun },
-    { id: 'afternoon', label: 'Noon', icon: Sunset },
-    { id: 'evening', label: 'Eve', icon: Moon },
-    { id: 'anytime', label: 'All', icon: Sparkles },
+    { id: 'morning', label: t.habits.morning, icon: Sun },
+    { id: 'afternoon', label: t.habits.afternoon, icon: Sunset },
+    { id: 'evening', label: t.habits.evening, icon: Moon },
+    { id: 'anytime', label: t.habits.anytime, icon: Sparkles },
   ];
 
   return (
@@ -55,7 +57,7 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Quick add habit (e.g., Morning 10-min meditation)..."
+          placeholder={t.habits.quickAddPlaceholder}
           className="flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/70 focus:ring-1 focus:ring-cyan-500/50 transition"
         />
         <button
@@ -64,7 +66,7 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
           className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium text-xs px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-md shadow-cyan-500/20 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Add</span>
+          <span>{t.habits.add}</span>
         </button>
       </div>
 
@@ -98,30 +100,27 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
           <select
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value as HabitDifficulty)}
-            className="bg-slate-950/80 border border-slate-800 text-slate-300 rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-cyan-500 cursor-pointer"
+            className="bg-slate-950/60 border border-slate-800/80 rounded-lg px-2 py-1 text-[11px] text-slate-300 focus:outline-none cursor-pointer"
           >
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
+            <option value="easy">{t.habits.difficultyEasy}</option>
+            <option value="medium">{t.habits.difficultyMedium}</option>
+            <option value="hard">{t.habits.difficultyHard}</option>
+          </select>
+
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value as HabitType)}
+            className="bg-slate-950/60 border border-slate-800/80 rounded-lg px-2 py-1 text-[11px] text-slate-300 focus:outline-none cursor-pointer"
+          >
+            <option value="daily">{t.habits.modalTypeDaily}</option>
+            <option value="positive_negative">{t.habits.modalTypeCounter}</option>
           </select>
 
           <button
             type="button"
-            onClick={() => setType(type === 'daily' ? 'positive_negative' : 'daily')}
-            className={`px-2 py-1 rounded-lg border text-[11px] font-medium transition cursor-pointer ${
-              type === 'daily'
-                ? 'bg-slate-800 border-slate-700 text-slate-300'
-                : 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-            }`}
-          >
-            {type === 'daily' ? 'Daily' : '+ / - Counter'}
-          </button>
-
-          <button
-            type="button"
             onClick={onOpenAdvanced}
-            title="More Options"
-            className="p-1 text-slate-400 hover:text-slate-200 transition rounded-lg hover:bg-slate-800 cursor-pointer"
+            className="p-1 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer"
+            title={t.habits.advanced}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
           </button>

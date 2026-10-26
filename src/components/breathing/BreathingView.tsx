@@ -4,8 +4,10 @@ import { BREATHING_STANDARDS } from '../../utils/breathingData';
 import type { BreathingExerciseId } from '../../types';
 import { useGamification } from '../../hooks/useGamification';
 import { db } from '../../db/db';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 export const BreathingView: React.FC = () => {
+  const { t } = useTranslation();
   const { profile, updatePreferences } = useGamification();
 
   const [selectedId, setSelectedId] = useState<BreathingExerciseId>('box');
@@ -33,10 +35,12 @@ export const BreathingView: React.FC = () => {
   }, [profile.defaultBreathingId, profile.preferredSessionMinutes]);
 
   const currentStandard = BREATHING_STANDARDS[selectedId];
+  const localizedStandard = t.breathing.standards[selectedId] || currentStandard;
   const isWimHof = selectedId === 'wim_hof';
 
   // Current step in regular flow
   const currentStep = currentStandard.steps[stepIndex] || currentStandard.steps[0];
+  const localizedStep = localizedStandard.steps?.[stepIndex] || currentStep;
 
   // Favorite toggle
   const isFavorite = profile.defaultBreathingId === selectedId;
@@ -162,29 +166,29 @@ export const BreathingView: React.FC = () => {
 
   // Determine current active animation class and CSS vars
   let animationClass = 'animate-breathe-hold';
-  let cueText = currentStep.cue;
-  let phaseName = currentStep.name;
+  let cueText = localizedStep.cue;
+  let phaseName = localizedStep.name;
   let scaleStart = currentStep.scaleStart;
   let scaleEnd = currentStep.scaleEnd;
   let phaseDuration = currentStep.durationSeconds;
 
   if (isWimHof) {
     if (wimState === 'breathing') {
-      phaseName = `Cycle ${wimCycle}/30`;
-      cueText = stepIndex === 0 ? 'Power Inhale' : 'Let It Go';
+      phaseName = `${t.breathing.cycleOf} ${wimCycle}/30`;
+      cueText = stepIndex === 0 ? t.breathing.powerInhale : t.breathing.letItGo;
       animationClass = stepIndex === 0 ? 'animate-breathe-expand' : 'animate-breathe-contract';
       scaleStart = stepIndex === 0 ? 1.0 : 1.6;
       scaleEnd = stepIndex === 0 ? 1.6 : 1.1;
       phaseDuration = stepIndex === 0 ? 2 : 1.5;
     } else if (wimState === 'retention') {
-      phaseName = 'Retention Hold';
-      cueText = 'Hold on Empty — Relax';
+      phaseName = t.breathing.retentionHold;
+      cueText = t.breathing.holdOnEmptyRelax;
       animationClass = 'animate-breathe-hold';
       scaleStart = 1.0;
       scaleEnd = 1.0;
     } else if (wimState === 'recovery') {
-      phaseName = 'Recovery Hold';
-      cueText = 'Inhale Full & Hold 15s';
+      phaseName = t.breathing.recoveryHold;
+      cueText = t.breathing.inhaleFullAndHold15s;
       animationClass = 'animate-breathe-hold';
       scaleStart = 1.6;
       scaleEnd = 1.6;
@@ -210,7 +214,7 @@ export const BreathingView: React.FC = () => {
       {/* Exercise Selection Dropdown (Select Input) */}
       <div className="relative w-full">
         <label htmlFor="breathing-select" className="sr-only">
-          Select Breathing Method
+          {t.breathing.selectMethod}
         </label>
         <select
           id="breathing-select"
@@ -219,7 +223,7 @@ export const BreathingView: React.FC = () => {
           className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 cursor-pointer shadow-sm appearance-none pr-10"
         >
           {(Object.keys(BREATHING_STANDARDS) as BreathingExerciseId[]).map((id) => {
-            const standard = BREATHING_STANDARDS[id];
+            const standard = t.breathing.standards[id] || BREATHING_STANDARDS[id];
             return (
               <option key={id} value={id} className="bg-slate-900 text-slate-200">
                 {standard.name} — {standard.tagline}
@@ -238,22 +242,22 @@ export const BreathingView: React.FC = () => {
         <div className="w-full flex items-center justify-between z-10">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-white tracking-tight">{currentStandard.name}</h2>
+              <h2 className="text-base font-bold text-white tracking-tight">{localizedStandard.name}</h2>
               <button
                 onClick={toggleFavorite}
-                title={isFavorite ? 'Default Preferred Protocol' : 'Star as default'}
+                title={isFavorite ? t.breathing.defaultActiveTooltip : t.breathing.defaultTooltip}
                 className="text-amber-400 transition hover:scale-110 cursor-pointer"
               >
                 <Star className={`w-4 h-4 ${isFavorite ? 'fill-amber-400' : 'opacity-40'}`} />
               </button>
             </div>
-            <p className="text-[11px] text-cyan-400 font-medium">{currentStandard.tagline}</p>
+            <p className="text-[11px] text-cyan-400 font-medium">{localizedStandard.tagline}</p>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold px-2.5 py-1 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700/60">
               {isWimHof && wimState === 'retention'
-                ? `Hold: ${retentionSeconds}s`
+                ? `${t.breathing.holdPrefix} ${retentionSeconds}s`
                 : formatTimer(totalSecondsLeft)}
             </span>
           </div>
@@ -306,7 +310,7 @@ export const BreathingView: React.FC = () => {
               onClick={endRetentionHold}
               className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-lg shadow-orange-500/30 transition cursor-pointer"
             >
-              Inhale & End Retention
+              {t.breathing.inhaleAndEndRetention}
             </button>
           </div>
         )}
@@ -335,7 +339,7 @@ export const BreathingView: React.FC = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={resetSession}
-              title="Reset"
+              title={t.breathing.reset}
               className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition active:scale-95 cursor-pointer border border-slate-700/60"
             >
               <RotateCcw className="w-5 h-5" />
@@ -348,12 +352,12 @@ export const BreathingView: React.FC = () => {
               {isActive ? (
                 <>
                   <Pause className="w-5 h-5 fill-white" />
-                  <span>Pause</span>
+                  <span>{t.breathing.pause}</span>
                 </>
               ) : (
                 <>
                   <Play className="w-5 h-5 fill-white" />
-                  <span>{totalSecondsLeft < sessionMinutes * 60 ? 'Resume' : 'Begin Pacer'}</span>
+                  <span>{totalSecondsLeft < sessionMinutes * 60 ? t.breathing.resume : t.breathing.beginPacer}</span>
                 </>
               )}
             </button>
@@ -366,14 +370,14 @@ export const BreathingView: React.FC = () => {
         <div className="flex items-center gap-2 text-cyan-400">
           <Info className="w-4 h-4" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-            About {currentStandard.name}
+            {t.breathing.about} {localizedStandard.name}
           </h3>
         </div>
         <p className="text-xs text-slate-400 leading-relaxed">
-          {currentStandard.description}
+          {localizedStandard.description}
         </p>
         <div className="flex flex-col gap-1.5 pt-1">
-          {currentStandard.benefits.map((b, idx) => (
+          {localizedStandard.benefits.map((b, idx) => (
             <div key={idx} className="flex items-center gap-2 text-[11px] text-slate-300">
               <Sparkles className="w-3 h-3 text-cyan-400 shrink-0" />
               <span>{b}</span>
@@ -390,9 +394,9 @@ export const BreathingView: React.FC = () => {
               <CheckCircle className="w-8 h-8" />
             </div>
 
-            <h3 className="text-base font-bold text-white">Session Completed!</h3>
+            <h3 className="text-base font-bold text-white">{t.breathing.sessionCompletedTitle}</h3>
             <p className="text-xs text-slate-300">
-              You downregulated your nervous system and enhanced heart-rate coherence.
+              {t.breathing.sessionCompletedDesc}
             </p>
 
             <button
@@ -402,7 +406,7 @@ export const BreathingView: React.FC = () => {
               }}
               className="w-full mt-3 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-xs shadow-md shadow-cyan-500/20 cursor-pointer"
             >
-              Continue Journey
+              {t.breathing.continueJourney}
             </button>
           </div>
         </div>

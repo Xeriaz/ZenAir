@@ -1,6 +1,5 @@
 import Dexie, { type Table } from 'dexie';
 import type { Habit, HabitLog, TaskItem, BreathingLog, UserProfile, DatabaseBackup } from '../types';
-import { generate50DaysDemoData } from './seedData';
 
 export class ZenAirDatabase extends Dexie {
   habits!: Table<Habit, number>;
@@ -30,8 +29,8 @@ export const INITIAL_USER_PROFILE: UserProfile = {
   id: 1,
   level: 1,
   xp: 0,
-  gold: 50,
-  streakFreezes: 2,
+  gold: 0,
+  streakFreezes: 0,
   defaultBreathingId: 'box',
   preferredSessionMinutes: 3,
   theme: 'dark'
@@ -44,7 +43,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     timeOfDay: 'morning',
     scheduledTime: '07:30',
     streak: 0,
-    bestStreak: 14,
+    bestStreak: 0,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -55,7 +54,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     timeOfDay: 'morning',
     scheduledTime: '08:00',
     streak: 0,
-    bestStreak: 12,
+    bestStreak: 0,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -66,7 +65,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     timeOfDay: 'afternoon',
     scheduledTime: '14:00',
     streak: 0,
-    bestStreak: 19,
+    bestStreak: 0,
     difficulty: 'medium',
     createdAt: new Date().toISOString(),
     archived: false
@@ -76,7 +75,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'positive_negative',
     timeOfDay: 'anytime',
     streak: 0,
-    bestStreak: 15,
+    bestStreak: 0,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -87,7 +86,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     timeOfDay: 'evening',
     scheduledTime: '21:30',
     streak: 0,
-    bestStreak: 10,
+    bestStreak: 0,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -95,23 +94,29 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
 ];
 
 /**
- * Initializes the database with seed data if tables are empty.
+ * Initializes the database when opened for the first time.
+ * Only ensures the initial clean user profile exists without seeding dummy data.
  */
 export async function initializeDatabase(): Promise<void> {
   const profileCount = await db.userProfile.count();
   if (profileCount === 0) {
     await db.userProfile.put(INITIAL_USER_PROFILE);
   }
+}
 
-  const habitsCount = await db.habits.count();
-  if (habitsCount === 0) {
-    await db.habits.bulkAdd(INITIAL_HABITS as Habit[]);
-  }
-
-  const logsCount = await db.habitLogs.count();
-  if (logsCount === 0) {
-    await generate50DaysDemoData();
-  }
+/**
+ * Resets all database tables: clears habits, habit logs, tasks, breathing logs,
+ * and resets user profile to the clean initial state.
+ */
+export async function resetAllDatabaseData(): Promise<void> {
+  await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.tasks, db.breathingLogs], async () => {
+    await db.habits.clear();
+    await db.habitLogs.clear();
+    await db.tasks.clear();
+    await db.breathingLogs.clear();
+    await db.userProfile.clear();
+    await db.userProfile.put(INITIAL_USER_PROFILE);
+  });
 }
 
 /**

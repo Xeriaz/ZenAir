@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle2, Clock, Wind, BarChart3, Settings } from 'lucide-react';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 export type NavTab = 'habits' | 'tasks' | 'breathing' | 'analytics' | 'settings';
 
@@ -9,12 +10,14 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onTabChange }) => {
-  const tabs = [
-    { id: 'habits' as NavTab, label: 'Habits', icon: CheckCircle2 },
-    { id: 'tasks' as NavTab, label: 'Timeline', icon: Clock },
-    { id: 'breathing' as NavTab, label: 'Breathe', icon: Wind },
-    { id: 'analytics' as NavTab, label: 'Analytics', icon: BarChart3 },
-    { id: 'settings' as NavTab, label: 'Settings', icon: Settings },
+  const { t } = useTranslation();
+
+  const tabs: { id: NavTab; label: string; icon: React.FC<{ className?: string }> }[] = [
+    { id: 'habits', label: t.nav.habits, icon: CheckCircle2 },
+    { id: 'tasks', label: t.nav.tasks, icon: Clock },
+    { id: 'breathing', label: t.nav.breathing, icon: Wind },
+    { id: 'analytics', label: t.nav.analytics, icon: BarChart3 },
+    { id: 'settings', label: t.nav.settings, icon: Settings },
   ];
 
   return (

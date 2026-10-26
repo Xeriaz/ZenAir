@@ -8,6 +8,7 @@ import {
   eachDayOfInterval,
   startOfWeek
 } from 'date-fns';
+import { lt as ltLocale } from 'date-fns/locale';
 
 export function getTodayDateString(): string {
   return format(new Date(), 'yyyy-MM-dd');
@@ -21,12 +22,14 @@ export function formatDateKey(date: Date): string {
   return format(date, 'yyyy-MM-dd');
 }
 
-export function formatReadableDate(dateStr: string): string {
+export function formatReadableDate(dateStr: string, language: 'en' | 'lt' = 'en'): string {
   try {
     const d = parseISO(dateStr);
-    if (isToday(d)) return 'Today';
-    if (isYesterday(d)) return 'Yesterday';
-    return format(d, 'EEE, MMM d');
+    if (isToday(d)) return language === 'lt' ? 'Šiandien' : 'Today';
+    if (isYesterday(d)) return language === 'lt' ? 'Vakar' : 'Yesterday';
+    return format(d, language === 'lt' ? 'MMM d, EEE' : 'EEE, MMM d', {
+      locale: language === 'lt' ? ltLocale : undefined
+    });
   } catch {
     return dateStr;
   }

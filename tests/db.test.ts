@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, initializeDatabase, exportDatabaseToJson, importDatabaseFromJson } from '../src/db/db';
+import { db, initializeDatabase, resetAllDatabaseData, exportDatabaseToJson, importDatabaseFromJson } from '../src/db/db';
 
 describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
   beforeEach(async () => {
@@ -10,21 +10,92 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
     await db.breathingLogs.clear();
   });
 
-  it('should seed initial user profile and sample habits on empty start', async () => {
+  it('should initialize clean user profile and no dummy data on first start', async () => {
     await initializeDatabase();
 
     const profile = await db.userProfile.toArray();
     expect(profile.length).toBe(1);
-    expect(profile[0].level).toBeGreaterThanOrEqual(1);
-    expect(profile[0].streakFreezes).toBeGreaterThanOrEqual(2);
+    expect(profile[0].level).toBe(1);
+    expect(profile[0].xp).toBe(0);
+    expect(profile[0].gold).toBe(0);
+    expect(profile[0].streakFreezes).toBe(0);
 
     const habits = await db.habits.toArray();
-    expect(habits.length).toBeGreaterThan(0);
-    expect(habits[0].title).toBeDefined();
+    expect(habits.length).toBe(0);
 
-    // Verify ~50 days of tracking data were seeded
     const logs = await db.habitLogs.toArray();
-    expect(logs.length).toBeGreaterThan(50);
+    expect(logs.length).toBe(0);
+
+    const tasks = await db.tasks.toArray();
+    expect(tasks.length).toBe(0);
+
+    const breathing = await db.breathingLogs.toArray();
+    expect(breathing.length).toBe(0);
+  });
+
+  it('should reset all database tables to a clean state with resetAllDatabaseData', async () => {
+    // Populate some data first
+    await db.habits.add({
+      title: 'Temporary Habit',
+      type: 'daily',
+      timeOfDay: 'morning',
+      streak: 5,
+      bestStreak: 10,
+      difficulty: 'easy',
+      createdAt: new Date().toISOString(),
+      archived: false
+    });
+    await db.tasks.add({
+      title: 'Temporary Task',
+      date: '2026-10-26',
+      startTime: '10:00',
+      durationMinutes: 45,
+      completed: true,
+      createdAt: new Date().toISOString()
+    });
+    await db.habitLogs.add({
+      habitId: 1,
+      date: '2026-10-26',
+      count: 1,
+      xpEarned: 10,
+      timestamp: Date.now()
+    });
+    await db.breathingLogs.add({
+      exerciseId: 'box',
+      durationSeconds: 180,
+      completedAt: new Date().toISOString()
+    });
+    await db.userProfile.put({
+      id: 1,
+      level: 5,
+      xp: 200,
+      gold: 150,
+      streakFreezes: 3,
+      defaultBreathingId: 'box',
+      preferredSessionMinutes: 3,
+      theme: 'dark'
+    });
+
+    expect(await db.habits.count()).toBe(1);
+    expect(await db.tasks.count()).toBe(1);
+    expect(await db.habitLogs.count()).toBe(1);
+    expect(await db.breathingLogs.count()).toBe(1);
+
+    // Call resetAllDatabaseData
+    await resetAllDatabaseData();
+
+    // Verify all tables are cleared
+    expect(await db.habits.count()).toBe(0);
+    expect(await db.tasks.count()).toBe(0);
+    expect(await db.habitLogs.count()).toBe(0);
+    expect(await db.breathingLogs.count()).toBe(0);
+
+    const profile = await db.userProfile.toArray();
+    expect(profile.length).toBe(1);
+    expect(profile[0].level).toBe(1);
+    expect(profile[0].xp).toBe(0);
+    expect(profile[0].gold).toBe(0);
+    expect(profile[0].streakFreezes).toBe(0);
   });
 
   it('should perform Habit CRUD operations reliably', async () => {
