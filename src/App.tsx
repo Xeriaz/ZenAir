@@ -23,9 +23,9 @@ export const App: React.FC = () => {
 
   if (!isDbReady) {
     return (
-      <div className="min-h-screen bg-[#0b0714] flex items-center justify-center text-purple-300/70 text-sm">
+      <div className="min-h-screen bg-[#090d16] flex items-center justify-center text-slate-400 text-sm">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
           <span>Awakening ZenAir...</span>
         </div>
       </div>
@@ -33,7 +33,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0714] text-purple-100 flex flex-col font-sans pb-safe">
+    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans pb-safe">
       {/* Gamification Header */}
       <Header />
 

@@ -226,8 +226,8 @@ export const BreathingView: React.FC = () => {
               onClick={() => handleSelectStandard(id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
                 isSelected
-                  ? 'bg-purple-500 text-white shadow-md shadow-purple-500/25'
-                  : 'bg-[#160e29]/90 text-purple-300/70 hover:text-purple-100 border border-purple-900/40'
+                  ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                  : 'bg-slate-900/80 text-slate-400 hover:text-slate-200 border border-slate-800'
               }`}
             >
               <span>{standard.name}</span>
@@ -237,7 +237,7 @@ export const BreathingView: React.FC = () => {
       </div>
 
       {/* Main Interactive Visual Pacer Card */}
-      <div className="bg-gradient-to-b from-[#170f2b] via-[#140d26] to-purple-950/60 border border-purple-900/40 rounded-3xl p-5 flex flex-col items-center justify-between gap-6 shadow-xl relative overflow-hidden min-h-[440px]">
+      <div className="bg-gradient-to-b from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 rounded-3xl p-5 flex flex-col items-center justify-between gap-6 shadow-xl relative overflow-hidden min-h-[440px]">
         {/* Top Info Bar */}
         <div className="w-full flex items-center justify-between z-10">
           <div className="flex flex-col">
@@ -251,11 +251,11 @@ export const BreathingView: React.FC = () => {
                 <Star className={`w-4 h-4 ${isFavorite ? 'fill-amber-400' : 'opacity-40'}`} />
               </button>
             </div>
-            <p className="text-[11px] text-purple-400 font-medium">{currentStandard.tagline}</p>
+            <p className="text-[11px] text-cyan-400 font-medium">{currentStandard.tagline}</p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2.5 py-1 rounded-xl bg-purple-950/70 text-purple-200 border border-purple-800/50">
+            <span className="text-xs font-bold px-2.5 py-1 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700/60">
               {isWimHof && wimState === 'retention'
                 ? `Hold: ${retentionSeconds}s`
                 : formatTimer(totalSecondsLeft)}
@@ -267,7 +267,7 @@ export const BreathingView: React.FC = () => {
         <div className="relative flex items-center justify-center my-auto py-6">
           {/* Animated Glow Rings */}
           <div
-            className={`absolute w-44 h-44 rounded-full border border-purple-500/25 pointer-events-none ${
+            className={`absolute w-44 h-44 rounded-full border border-cyan-500/20 pointer-events-none ${
               isActive ? 'animate-breathe-ripple' : ''
             }`}
           />
@@ -285,17 +285,17 @@ export const BreathingView: React.FC = () => {
             }
             className={`w-48 h-48 rounded-full flex flex-col items-center justify-center p-4 text-center shadow-2xl transition-all duration-300 ${
               isActive
-                ? `${animationClass} bg-gradient-to-tr from-purple-600/30 via-violet-600/30 to-fuchsia-600/30 border-2 border-purple-400/80 shadow-purple-500/30 ring-4 ring-purple-500/10`
-                : 'bg-[#120a20] border-2 border-purple-800/60 opacity-80'
+                ? `${animationClass} bg-gradient-to-tr from-cyan-600/30 via-indigo-600/30 to-purple-600/30 border-2 border-cyan-400/80 shadow-cyan-500/30 ring-4 ring-cyan-500/10`
+                : 'bg-slate-900 border-2 border-slate-700/60 opacity-80'
             }`}
           >
-            <span className="text-xs uppercase tracking-wider font-extrabold text-purple-400 mb-1">
+            <span className="text-xs uppercase tracking-wider font-extrabold text-cyan-400 mb-1">
               {phaseName}
             </span>
             <span className="text-sm font-bold text-white px-2 leading-tight">
               {cueText}
             </span>
-            <span className="text-2xl font-black text-purple-300 mt-1">
+            <span className="text-2xl font-black text-cyan-300 mt-1">
               {isWimHof && wimState === 'retention'
                 ? `${retentionSeconds}s`
                 : `${phaseSecondsLeft}s`}
@@ -318,15 +318,15 @@ export const BreathingView: React.FC = () => {
         {/* Bottom Duration Pills & Controls */}
         <div className="w-full flex flex-col items-center gap-3 z-10">
           {!isActive && !isWimHof && (
-            <div className="flex items-center gap-1.5 bg-[#10091d]/80 p-1 rounded-xl border border-purple-900/50">
+            <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
               {[1, 3, 5, 10].map((mins) => (
                 <button
                   key={mins}
                   onClick={() => handleSelectDuration(mins)}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
                     sessionMinutes === mins
-                      ? 'bg-purple-500 text-white'
-                      : 'text-purple-300/60 hover:text-purple-200'
+                      ? 'bg-cyan-500 text-slate-950'
+                      : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
                   {mins}m
@@ -340,14 +340,14 @@ export const BreathingView: React.FC = () => {
             <button
               onClick={resetSession}
               title="Reset"
-              className="p-3 rounded-2xl bg-purple-950/70 hover:bg-purple-900/50 text-purple-200 transition active:scale-95 cursor-pointer border border-purple-800/50"
+              className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition active:scale-95 cursor-pointer border border-slate-700/60"
             >
               <RotateCcw className="w-5 h-5" />
             </button>
 
             <button
               onClick={() => setIsActive(!isActive)}
-              className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-400 hover:to-violet-500 text-white font-bold text-sm flex items-center gap-2 shadow-xl shadow-purple-500/25 transition active:scale-95 cursor-pointer"
+              className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm flex items-center gap-2 shadow-xl shadow-cyan-500/25 transition active:scale-95 cursor-pointer"
             >
               {isActive ? (
                 <>
@@ -366,20 +366,20 @@ export const BreathingView: React.FC = () => {
       </div>
 
       {/* Protocol Benefits & Description Card */}
-      <div className="bg-[#160e29]/80 border border-purple-900/40 rounded-3xl p-4 flex flex-col gap-2.5 shadow-sm">
-        <div className="flex items-center gap-2 text-purple-400">
+      <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 flex flex-col gap-2.5 shadow-sm">
+        <div className="flex items-center gap-2 text-cyan-400">
           <Info className="w-4 h-4" />
-          <h3 className="text-xs font-bold uppercase tracking-wider text-purple-200">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
             About {currentStandard.name}
           </h3>
         </div>
-        <p className="text-xs text-purple-300/70 leading-relaxed">
+        <p className="text-xs text-slate-400 leading-relaxed">
           {currentStandard.description}
         </p>
         <div className="flex flex-col gap-1.5 pt-1">
           {currentStandard.benefits.map((b, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-[11px] text-purple-200">
-              <Sparkles className="w-3 h-3 text-purple-400 shrink-0" />
+            <div key={idx} className="flex items-center gap-2 text-[11px] text-slate-300">
+              <Sparkles className="w-3 h-3 text-cyan-400 shrink-0" />
               <span>{b}</span>
             </div>
           ))}
@@ -389,17 +389,17 @@ export const BreathingView: React.FC = () => {
       {/* Completion Modal */}
       {isCompletedModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-[#160e29] border border-purple-500/40 rounded-3xl p-6 w-full max-w-sm text-center flex flex-col items-center gap-3 shadow-2xl shadow-purple-500/20">
-            <div className="w-14 h-14 rounded-full bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400">
+          <div className="bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 w-full max-w-sm text-center flex flex-col items-center gap-3 shadow-2xl shadow-cyan-500/20">
+            <div className="w-14 h-14 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400">
               <CheckCircle className="w-8 h-8" />
             </div>
 
             <h3 className="text-base font-bold text-white">Session Completed!</h3>
-            <p className="text-xs text-purple-200">
+            <p className="text-xs text-slate-300">
               You downregulated your nervous system and enhanced heart-rate coherence.
             </p>
 
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 font-bold text-xs mt-1">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold text-xs mt-1">
               <Award className="w-4 h-4" />
               <span>+{BREATHING_SESSION_REWARD.xp} XP & +{BREATHING_SESSION_REWARD.gold} Gold</span>
             </div>
@@ -409,7 +409,7 @@ export const BreathingView: React.FC = () => {
                 setIsCompletedModalOpen(false);
                 resetSession();
               }}
-              className="w-full mt-3 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-violet-600 text-white font-semibold text-xs shadow-md shadow-purple-500/20 cursor-pointer"
+              className="w-full mt-3 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-xs shadow-md shadow-cyan-500/20 cursor-pointer"
             >
               Continue Journey
             </button>

@@ -2,10 +2,10 @@
 
 @layer base {
   :root {
-    --color-bg: #0b0714;
-    --color-surface: #140d24;
-    --color-card: #1c1332;
-    --color-border: #2e1f4d;
+    --color-bg: #090d16;
+    --color-surface: #111827;
+    --color-card: #182234;
+    --color-border: #26354a;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 16px);
   }
@@ -19,7 +19,7 @@
   body {
     font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background-color: var(--color-bg);
-    color: #f3e8ff;
+    color: #f1f5f9;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -69,11 +69,11 @@
 @keyframes breathe-hold-ambient {
   0%, 100% {
     transform: scale(var(--scale-hold, 1.6)) translateZ(0);
-    filter: drop-shadow(0 0 24px rgba(168, 85, 247, 0.45));
+    filter: drop-shadow(0 0 24px rgba(6, 182, 212, 0.45));
   }
   50% {
     transform: scale(calc(var(--scale-hold, 1.6) * 1.02)) translateZ(0);
-    filter: drop-shadow(0 0 32px rgba(192, 132, 252, 0.65));
+    filter: drop-shadow(0 0 32px rgba(6, 182, 212, 0.65));
   }
 }
 
@@ -116,6 +116,6 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3b255e;
+  background: #273549;
   border-radius: 4px;
 }

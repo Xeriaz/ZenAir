@@ -57,20 +57,20 @@ export const HabitList: React.FC = () => {
   return (
     <div className="flex flex-col gap-4 max-w-2xl mx-auto px-4 pt-3 pb-8">
       {/* Daily Completion Header Summary */}
-      <div className="bg-gradient-to-r from-[#170f2b] via-[#140d26] to-purple-950/50 border border-purple-900/40 rounded-3xl p-4 flex flex-col gap-2.5 shadow-sm">
+      <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 rounded-3xl p-4 flex flex-col gap-2.5 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-purple-400" />
+            <CheckCircle className="w-5 h-5 text-cyan-400" />
             <h2 className="text-sm font-bold text-white tracking-tight">Today's Habits</h2>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
             {completedDailyCount} / {dailyHabits.length} Done ({completionPct}%)
           </span>
         </div>
 
-        <div className="w-full h-1.5 rounded-full bg-purple-950/60 overflow-hidden">
+        <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-400 to-fuchsia-400 rounded-full transition-all duration-300"
+            className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 rounded-full transition-all duration-300"
             style={{ width: `${completionPct}%` }}
           />
         </div>
@@ -98,8 +98,8 @@ export const HabitList: React.FC = () => {
               onClick={() => setSelectedTimeFilter(tab.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition cursor-pointer ${
                 isSelected
-                  ? 'bg-purple-500 text-white font-bold shadow-md shadow-purple-500/25'
-                  : 'bg-[#160e29]/90 text-purple-300/70 hover:text-purple-100 border border-purple-900/40'
+                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
+                  : 'bg-slate-900/80 text-slate-400 hover:text-slate-200 border border-slate-800'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -112,10 +112,10 @@ export const HabitList: React.FC = () => {
       {/* Habit Cards */}
       <div className="flex flex-col gap-2.5">
         {filteredHabits.length === 0 ? (
-          <div className="text-center py-12 px-4 rounded-3xl bg-[#160e29]/40 border border-purple-900/40 flex flex-col items-center justify-center gap-2">
-            <Sparkles className="w-8 h-8 text-purple-400/40" />
-            <p className="text-sm font-semibold text-purple-200">No habits in this category yet</p>
-            <p className="text-xs text-purple-400/60 max-w-xs">
+          <div className="text-center py-12 px-4 rounded-3xl bg-slate-900/40 border border-slate-800/80 flex flex-col items-center justify-center gap-2">
+            <Sparkles className="w-8 h-8 text-cyan-400/40" />
+            <p className="text-sm font-semibold text-slate-300">No habits in this category yet</p>
+            <p className="text-xs text-slate-500 max-w-xs">
               Use the quick-add bar above to create a new habit in seconds.
             </p>
           </div>

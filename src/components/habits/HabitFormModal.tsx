@@ -66,16 +66,16 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#160e29] border border-purple-800/60 rounded-3xl w-full max-w-md p-5 shadow-2xl flex flex-col gap-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-5 shadow-2xl flex flex-col gap-4">
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-purple-900/50">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
           <h3 className="text-base font-bold text-white">
             {initialHabit ? 'Edit Habit' : 'New Habit'}
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-purple-300 hover:text-white hover:bg-purple-900/40 transition cursor-pointer"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -84,7 +84,7 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
           <div>
-            <label className="block text-xs font-semibold text-purple-200 mb-1">
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
               Habit Title
             </label>
             <input
@@ -93,19 +93,19 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. 20-minute daily reading"
-              className="w-full bg-[#10091d] border border-purple-900/60 rounded-xl px-3.5 py-2.5 text-sm text-purple-100 placeholder:text-purple-400/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-purple-200 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Type
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as HabitType)}
-                className="w-full bg-[#10091d] border border-purple-900/60 rounded-xl px-3 py-2 text-xs text-purple-100 focus:outline-none focus:border-purple-500 cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
               >
                 <option value="daily">Daily Checklist</option>
                 <option value="positive_negative">Positive / Negative (+/-)</option>
@@ -113,13 +113,13 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-purple-200 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Difficulty (XP Reward)
               </label>
               <select
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value as HabitDifficulty)}
-                className="w-full bg-[#10091d] border border-purple-900/60 rounded-xl px-3 py-2 text-xs text-purple-100 focus:outline-none focus:border-purple-500 cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
               >
                 <option value="easy">Easy (+10 XP, +5 Gold)</option>
                 <option value="medium">Medium (+20 XP, +10 Gold)</option>
@@ -130,13 +130,13 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-purple-200 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Time of Day
               </label>
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value as TimeOfDay)}
-                className="w-full bg-[#10091d] border border-purple-900/60 rounded-xl px-3 py-2 text-xs text-purple-100 focus:outline-none focus:border-purple-500 cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
               >
                 <option value="morning">Morning</option>
                 <option value="afternoon">Afternoon</option>
@@ -146,30 +146,30 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-purple-200 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Time Block (HH:mm)
               </label>
               <input
                 type="time"
                 value={scheduledTime}
                 onChange={(e) => setScheduledTime(e.target.value)}
-                className="w-full bg-[#10091d] border border-purple-900/60 rounded-xl px-3 py-2 text-xs text-purple-100 focus:outline-none focus:border-purple-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-purple-900/50">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-purple-300/80 hover:text-white transition cursor-pointer"
+              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!title.trim() || saving}
-              className="bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-400 hover:to-violet-500 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition shadow-md shadow-purple-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
+              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition shadow-md shadow-cyan-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
             >
               {saving ? 'Saving...' : initialHabit ? 'Save Changes' : 'Create Habit'}
             </button>
