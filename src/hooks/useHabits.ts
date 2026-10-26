@@ -54,15 +54,9 @@ export function useHabits() {
         .first();
 
       let newStreak = habit.streak;
-      let usedFreeze = false;
 
       if (yesterdayLog) {
         newStreak = habit.streak + 1;
-      } else if (habit.streak > 0 && profile.streakFreezes > 0) {
-        // Use a streak freeze forgiveness token
-        profile.streakFreezes -= 1;
-        newStreak = habit.streak + 1;
-        usedFreeze = true;
       } else {
         // Streak broken or brand new
         newStreak = 1;
@@ -80,11 +74,8 @@ export function useHabits() {
         timestamp: Date.now()
       });
 
-      // Award XP & Gold
+      // Award XP & Gold in background
       const { updated, leveledUp } = calculateStatsUpdate(profile, rewards.xp, rewards.gold);
-      if (usedFreeze) {
-        updated.streakFreezes = profile.streakFreezes;
-      }
       await db.userProfile.put(updated);
 
       return { completed: true, leveledUp, xpEarned: rewards.xp };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Star, Play, Pause, RotateCcw, CheckCircle, Sparkles, Info, ChevronDown, Coins } from 'lucide-react';
+import { Star, Play, Pause, RotateCcw, CheckCircle, Sparkles, Info, ChevronDown } from 'lucide-react';
 import { BREATHING_STANDARDS } from '../../utils/breathingData';
 import type { BreathingExerciseId } from '../../types';
 import { useGamification } from '../../hooks/useGamification';
@@ -402,11 +402,6 @@ export const BreathingView: React.FC = () => {
             <p className="text-xs text-slate-300">
               You downregulated your nervous system and enhanced heart-rate coherence.
             </p>
-
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold text-xs mt-1">
-              <Coins className="w-4 h-4 text-amber-400" />
-              <span>+{BREATHING_SESSION_REWARD.gold} Gold</span>
-            </div>
 
             <button
               onClick={() => {

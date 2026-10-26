@@ -1,12 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Download, Upload, ShieldCheck, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles } from 'lucide-react';
+import { Download, Upload, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles } from 'lucide-react';
 import { downloadDatabaseBackup, importDatabaseFromJson, db, initializeDatabase } from '../../db/db';
 import { generate50DaysDemoData } from '../../db/seedData';
-import { useGamification } from '../../hooks/useGamification';
-import { STREAK_FREEZE_PRICE } from '../../utils/gamification';
 
 export const SettingsView: React.FC = () => {
-  const { profile, buyStreakFreeze } = useGamification();
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError?: boolean } | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -50,19 +47,6 @@ export const SettingsView: React.FC = () => {
     reader.readAsText(file);
   };
 
-  const handleBuyFreeze = async () => {
-    if (profile.gold < STREAK_FREEZE_PRICE) {
-      setStatusMessage({ text: `Not enough Gold. Need ${STREAK_FREEZE_PRICE}g, you have ${profile.gold}g.`, isError: true });
-      setTimeout(() => setStatusMessage(null), 4000);
-      return;
-    }
-    const success = await buyStreakFreeze();
-    if (success) {
-      setStatusMessage({ text: 'Acquired 1 Streak Freeze Token!' });
-      setTimeout(() => setStatusMessage(null), 4000);
-    }
-  };
-
   const handleGenerate50DaysData = async () => {
     setIsGenerating(true);
     try {
@@ -100,31 +84,6 @@ export const SettingsView: React.FC = () => {
           <span>{statusMessage.text}</span>
         </div>
       )}
-
-      {/* Gamification Shop: Streak Freezes */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-cyan-400" />
-          <h3 className="text-sm font-bold text-white tracking-tight">Streak Forgiveness Shop</h3>
-        </div>
-        <p className="text-xs text-slate-400 leading-relaxed">
-          Life happens! A Streak Freeze token automatically preserves your active streaks if you miss a single day.
-        </p>
-
-        <div className="flex items-center justify-between bg-slate-950/70 p-3 rounded-2xl border border-slate-800">
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-slate-200">Current Token Balance</span>
-            <span className="text-xs text-cyan-400 font-bold">{profile.streakFreezes} Freezes Available</span>
-          </div>
-
-          <button
-            onClick={handleBuyFreeze}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 active:scale-95 transition cursor-pointer"
-          >
-            Buy for {STREAK_FREEZE_PRICE}g
-          </button>
-        </div>
-      </div>
 
       {/* Local Data Backup & Restore */}
       <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
