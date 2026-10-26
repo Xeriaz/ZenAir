@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-[#090d16]/95 backdrop-blur-md border-b border-slate-800/80 px-4 header-safe pb-3">
+    <header className="sticky top-0 z-30 bg-[#090d16] border-b border-slate-800/80 px-4 header-safe pb-3">
       <div className="max-w-2xl mx-auto flex flex-col gap-2">
         {/* Top row: Brand & Currencies */}
         <div className="flex items-center justify-between">
