@@ -226,7 +226,7 @@ export const BreathingView: React.FC = () => {
             const standard = t.breathing.standards[id] || BREATHING_STANDARDS[id];
             return (
               <option key={id} value={id} className="bg-slate-900 text-slate-200">
-                {standard.name} — {standard.tagline}
+                {standard.name}
               </option>
             );
           })}
