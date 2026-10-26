@@ -78,7 +78,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
           <div className="flex items-center gap-1.5 shrink-0 bg-slate-950/70 p-1 rounded-xl border border-slate-800">
             <button
               onClick={() => handleCount(false)}
-              title="Deduct XP"
+              title="Decrease count"
               className="w-7 h-7 rounded-lg bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 flex items-center justify-center transition active:scale-90 cursor-pointer"
             >
               <Minus className="w-3.5 h-3.5" />
@@ -86,7 +86,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             <span className="w-6 text-center font-bold text-xs text-slate-200">{count}</span>
             <button
               onClick={() => handleCount(true)}
-              title="Earn XP"
+              title="Increase count"
               className="w-7 h-7 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/30 text-emerald-400 flex items-center justify-center transition active:scale-90 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />

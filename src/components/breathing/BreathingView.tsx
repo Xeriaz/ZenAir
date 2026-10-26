@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Star, Play, Pause, RotateCcw, Award, CheckCircle, Sparkles, Info } from 'lucide-react';
+import { Star, Play, Pause, RotateCcw, CheckCircle, Sparkles, Info, ChevronDown, Coins } from 'lucide-react';
 import { BREATHING_STANDARDS } from '../../utils/breathingData';
 import type { BreathingExerciseId } from '../../types';
 import { useGamification } from '../../hooks/useGamification';
@@ -215,25 +215,29 @@ export const BreathingView: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4 max-w-2xl mx-auto px-4 pt-3 pb-8">
-      {/* Exercise Selection Carousel / Grid */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {(Object.keys(BREATHING_STANDARDS) as BreathingExerciseId[]).map((id) => {
-          const standard = BREATHING_STANDARDS[id];
-          const isSelected = selectedId === id;
-          return (
-            <button
-              key={id}
-              onClick={() => handleSelectStandard(id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
-                isSelected
-                  ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-                  : 'bg-slate-900/80 text-slate-400 hover:text-slate-200 border border-slate-800'
-              }`}
-            >
-              <span>{standard.name}</span>
-            </button>
-          );
-        })}
+      {/* Exercise Selection Dropdown (Select Input) */}
+      <div className="relative w-full">
+        <label htmlFor="breathing-select" className="sr-only">
+          Select Breathing Method
+        </label>
+        <select
+          id="breathing-select"
+          value={selectedId}
+          onChange={(e) => handleSelectStandard(e.target.value as BreathingExerciseId)}
+          className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 cursor-pointer shadow-sm appearance-none pr-10"
+        >
+          {(Object.keys(BREATHING_STANDARDS) as BreathingExerciseId[]).map((id) => {
+            const standard = BREATHING_STANDARDS[id];
+            return (
+              <option key={id} value={id} className="bg-slate-900 text-slate-200">
+                {standard.name} — {standard.tagline}
+              </option>
+            );
+          })}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400">
+          <ChevronDown className="w-4 h-4" />
+        </div>
       </div>
 
       {/* Main Interactive Visual Pacer Card */}
@@ -400,8 +404,8 @@ export const BreathingView: React.FC = () => {
             </p>
 
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold text-xs mt-1">
-              <Award className="w-4 h-4" />
-              <span>+{BREATHING_SESSION_REWARD.xp} XP & +{BREATHING_SESSION_REWARD.gold} Gold</span>
+              <Coins className="w-4 h-4 text-amber-400" />
+              <span>+{BREATHING_SESSION_REWARD.gold} Gold</span>
             </div>
 
             <button

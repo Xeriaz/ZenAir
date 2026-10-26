@@ -16,7 +16,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { BarChart3, PieChart as PieIcon, Flame, Calendar, Award, Wind } from 'lucide-react';
+import { BarChart3, PieChart as PieIcon, Flame, Calendar, Award, Wind, CheckCircle2 } from 'lucide-react';
 import { db } from '../../db/db';
 import { getLastNDaysDateStrings, get90DayGridDates, formatReadableDate } from '../../utils/dates';
 
@@ -31,21 +31,25 @@ export const AnalyticsView: React.FC = () => {
     return await db.habitLogs.toArray();
   }, []);
 
+  const tasks = useLiveQuery(async () => {
+    return await db.tasks.toArray();
+  }, []);
+
   const breathingLogs = useLiveQuery(async () => {
     return await db.breathingLogs.toArray();
   }, []);
 
   const activeHabits = habits ?? [];
   const allLogs = habitLogs ?? [];
+  const allTasks = tasks ?? [];
   const allBreathing = breathingLogs ?? [];
 
   // Group logs by date
-  const logsByDate = new Map<string, { count: number; xp: number }>();
+  const logsByDate = new Map<string, { count: number }>();
   allLogs.forEach((log) => {
-    const existing = logsByDate.get(log.date) || { count: 0, xp: 0 };
+    const existing = logsByDate.get(log.date) || { count: 0 };
     logsByDate.set(log.date, {
-      count: existing.count + (log.count > 0 ? 1 : 0),
-      xp: existing.xp + (log.xpEarned || 0)
+      count: existing.count + (log.count > 0 ? 1 : 0)
     });
   });
 
@@ -55,13 +59,12 @@ export const AnalyticsView: React.FC = () => {
   const totalDailyHabits = activeHabits.filter(h => h.type === 'daily').length || 1;
 
   const chartData = recentDateStrings.map((dateStr) => {
-    const data = logsByDate.get(dateStr) || { count: 0, xp: 0 };
+    const data = logsByDate.get(dateStr) || { count: 0 };
     const completionRate = Math.min(100, Math.round((data.count / totalDailyHabits) * 100));
     return {
       date: dateStr.slice(5), // MM-DD
       fullDate: dateStr,
       completionRate,
-      xp: data.xp,
       completedHabits: data.count
     };
   });
@@ -99,7 +102,7 @@ export const AnalyticsView: React.FC = () => {
 
   // High-level metrics
   const totalCompletedHabits = allLogs.reduce((acc, log) => acc + (log.count > 0 ? 1 : 0), 0);
-  const totalXpEarned = allLogs.reduce((acc, log) => acc + (log.xpEarned || 0), 0);
+  const totalCompletedTasks = allTasks.filter(t => t.completed).length;
   const totalBreathingMinutes = Math.round(
     allBreathing.reduce((acc, b) => acc + b.durationSeconds, 0) / 60
   );
@@ -118,10 +121,10 @@ export const AnalyticsView: React.FC = () => {
 
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
           <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
-            <Award className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Total XP</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Tasks Done</span>
           </div>
-          <span className="text-xl font-bold text-cyan-300 tracking-tight">{totalXpEarned}</span>
+          <span className="text-xl font-bold text-cyan-300 tracking-tight">{totalCompletedTasks}</span>
         </div>
 
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
@@ -133,7 +136,7 @@ export const AnalyticsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Completion & XP Diagram */}
+      {/* Completion Diagram */}
       <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -184,7 +187,7 @@ export const AnalyticsView: React.FC = () => {
                       <div className="bg-slate-900 border border-slate-700 p-2.5 rounded-xl shadow-xl text-xs flex flex-col gap-1">
                         <span className="font-semibold text-slate-200">{formatReadableDate(data.fullDate)}</span>
                         <span className="text-cyan-400 font-medium">Completion: {data.completionRate}%</span>
-                        <span className="text-indigo-300">XP Earned: {data.xp}</span>
+                        <span className="text-indigo-300">Habits Done: {data.completedHabits}</span>
                       </div>
                     );
                   }

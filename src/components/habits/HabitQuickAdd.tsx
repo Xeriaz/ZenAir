@@ -86,7 +86,7 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className="w-3.5 h-3.5" />
                 <span>{opt.label}</span>
               </button>
             );
@@ -100,9 +100,9 @@ export const HabitQuickAdd: React.FC<HabitQuickAddProps> = ({ onAdd, onOpenAdvan
             onChange={(e) => setDifficulty(e.target.value as HabitDifficulty)}
             className="bg-slate-950/80 border border-slate-800 text-slate-300 rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-cyan-500 cursor-pointer"
           >
-            <option value="easy">Easy (+10 XP)</option>
-            <option value="medium">Medium (+20 XP)</option>
-            <option value="hard">Hard (+35 XP)</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
           </select>
 
           <button

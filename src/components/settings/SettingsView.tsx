@@ -77,7 +77,7 @@ export const SettingsView: React.FC = () => {
   };
 
   const handleResetDefaults = async () => {
-    if (window.confirm('Reset habits to recommended defaults? This keeps your XP and level.')) {
+    if (window.confirm('Reset habits to recommended defaults? Your streak stats and history will be kept.')) {
       await db.habits.clear();
       await initializeDatabase();
       setStatusMessage({ text: 'Recommended habits re-initialized!' });

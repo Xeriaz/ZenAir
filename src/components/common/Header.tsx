@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { Coins, ShieldCheck, Plus, Sparkles, Award } from 'lucide-react';
+import { Coins, ShieldCheck, Plus, Sparkles } from 'lucide-react';
 import { useGamification } from '../../hooks/useGamification';
 import { STREAK_FREEZE_PRICE } from '../../utils/gamification';
 
-interface HeaderProps {
-  onLevelUpDismiss?: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = () => {
-  const { profile, xpRequired, progressPercent, buyStreakFreeze } = useGamification();
+export const Header: React.FC = () => {
+  const { profile, buyStreakFreeze } = useGamification();
   const [freezeMessage, setFreezeMessage] = useState<string | null>(null);
 
   const handleBuyFreeze = async () => {
@@ -36,9 +32,6 @@ export const Header: React.FC<HeaderProps> = () => {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-base font-bold tracking-tight text-white">ZenAir</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">
-                  Lv. {profile.level}
-                </span>
               </div>
             </div>
           </div>
@@ -70,26 +63,6 @@ export const Header: React.FC<HeaderProps> = () => {
             {freezeMessage}
           </div>
         )}
-
-        {/* Second row: XP Progress Bar */}
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between items-center text-[11px] text-slate-400 font-medium">
-            <span className="flex items-center gap-1">
-              <Award className="w-3 h-3 text-cyan-400" />
-              Experience
-            </span>
-            <span>
-              <strong className="text-slate-200">{profile.xp}</strong> / {xpRequired} XP
-              <span className="text-cyan-400 ml-1.5">({progressPercent}%)</span>
-            </span>
-          </div>
-          <div className="w-full h-2 rounded-full bg-slate-800/90 overflow-hidden relative border border-slate-700/50">
-            <div
-              className="h-full bg-gradient-to-r from-cyan-500 via-sky-400 to-indigo-500 rounded-full transition-all duration-500 ease-out shadow-sm shadow-cyan-400/50"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
       </div>
     </header>
   );

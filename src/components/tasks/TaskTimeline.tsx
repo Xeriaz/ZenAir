@@ -157,8 +157,6 @@ export const TaskTimeline: React.FC = () => {
                     <span className="text-cyan-400 font-semibold">{task.startTime}</span>
                     <span>•</span>
                     <span>{task.durationMinutes} mins</span>
-                    <span>•</span>
-                    <span className="text-emerald-400 font-medium">+15 XP</span>
                   </div>
                 </div>
               </div>
