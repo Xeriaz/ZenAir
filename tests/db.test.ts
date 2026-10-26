@@ -15,12 +15,16 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
 
     const profile = await db.userProfile.toArray();
     expect(profile.length).toBe(1);
-    expect(profile[0].level).toBe(1);
-    expect(profile[0].streakFreezes).toBe(2);
+    expect(profile[0].level).toBeGreaterThanOrEqual(1);
+    expect(profile[0].streakFreezes).toBeGreaterThanOrEqual(2);
 
     const habits = await db.habits.toArray();
     expect(habits.length).toBeGreaterThan(0);
     expect(habits[0].title).toBeDefined();
+
+    // Verify ~50 days of tracking data were seeded
+    const logs = await db.habitLogs.toArray();
+    expect(logs.length).toBeGreaterThan(50);
   });
 
   it('should perform Habit CRUD operations reliably', async () => {

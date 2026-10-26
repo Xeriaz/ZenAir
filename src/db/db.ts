@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import type { Habit, HabitLog, TaskItem, BreathingLog, UserProfile, DatabaseBackup } from '../types';
+import { generate50DaysDemoData } from './seedData';
 
 export class ZenAirDatabase extends Dexie {
   habits!: Table<Habit, number>;
@@ -39,8 +40,8 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'morning',
     scheduledTime: '07:30',
-    streak: 0,
-    bestStreak: 0,
+    streak: 5,
+    bestStreak: 14,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -50,8 +51,8 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'morning',
     scheduledTime: '08:00',
-    streak: 0,
-    bestStreak: 0,
+    streak: 4,
+    bestStreak: 12,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -61,8 +62,8 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'afternoon',
     scheduledTime: '14:00',
-    streak: 0,
-    bestStreak: 0,
+    streak: 7,
+    bestStreak: 19,
     difficulty: 'medium',
     createdAt: new Date().toISOString(),
     archived: false
@@ -71,8 +72,8 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     title: 'Mindful Posture & Stretch',
     type: 'positive_negative',
     timeOfDay: 'anytime',
-    streak: 0,
-    bestStreak: 0,
+    streak: 9,
+    bestStreak: 15,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -82,8 +83,8 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'evening',
     scheduledTime: '21:30',
-    streak: 0,
-    bestStreak: 0,
+    streak: 3,
+    bestStreak: 10,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
@@ -102,6 +103,11 @@ export async function initializeDatabase(): Promise<void> {
   const habitsCount = await db.habits.count();
   if (habitsCount === 0) {
     await db.habits.bulkAdd(INITIAL_HABITS as Habit[]);
+  }
+
+  const logsCount = await db.habitLogs.count();
+  if (logsCount === 0) {
+    await generate50DaysDemoData();
   }
 }
 

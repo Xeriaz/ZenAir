@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Download, Upload, ShieldCheck, Database, Check, AlertCircle, RefreshCw, Smartphone } from 'lucide-react';
+import { Download, Upload, ShieldCheck, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles } from 'lucide-react';
 import { downloadDatabaseBackup, importDatabaseFromJson, db, initializeDatabase } from '../../db/db';
+import { generate50DaysDemoData } from '../../db/seedData';
 import { useGamification } from '../../hooks/useGamification';
 import { STREAK_FREEZE_PRICE } from '../../utils/gamification';
 
@@ -9,6 +10,7 @@ export const SettingsView: React.FC = () => {
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError?: boolean } | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleExport = async () => {
@@ -58,6 +60,19 @@ export const SettingsView: React.FC = () => {
     if (success) {
       setStatusMessage({ text: 'Acquired 1 Streak Freeze Token!' });
       setTimeout(() => setStatusMessage(null), 4000);
+    }
+  };
+
+  const handleGenerate50DaysData = async () => {
+    setIsGenerating(true);
+    try {
+      await generate50DaysDemoData();
+      setStatusMessage({ text: 'Generated ~50 days of tracking data & analytics history!' });
+      setTimeout(() => setStatusMessage(null), 3000);
+    } catch {
+      setStatusMessage({ text: 'Failed to generate demo data.', isError: true });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -154,8 +169,17 @@ export const SettingsView: React.FC = () => {
       <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
         <div className="flex items-center gap-2">
           <RefreshCw className="w-4 h-4 text-slate-400" />
-          <h3 className="text-sm font-bold text-white tracking-tight">Maintenance & Reset</h3>
+          <h3 className="text-sm font-bold text-white tracking-tight">Maintenance & Demo Data</h3>
         </div>
+
+        <button
+          onClick={handleGenerate50DaysData}
+          disabled={isGenerating}
+          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 hover:from-cyan-500/30 hover:to-indigo-500/30 border border-cyan-500/40 text-cyan-300 font-semibold text-xs flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 disabled:opacity-50"
+        >
+          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <span>{isGenerating ? 'Generating...' : 'Generate ~50 Days Tracking Data'}</span>
+        </button>
 
         <button
           onClick={handleResetDefaults}
