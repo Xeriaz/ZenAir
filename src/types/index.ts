@@ -1,6 +1,6 @@
-export type HabitType = 'daily' | 'positive_negative';
-export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'anytime';
-export type HabitDifficulty = 'easy' | 'medium' | 'hard';
+export type HabitType = "daily" | "positive_negative";
+export type TimeOfDay = "morning" | "afternoon" | "evening" | "anytime";
+export type HabitDifficulty = "easy" | "medium" | "hard";
 
 export interface Habit {
   id?: number;
@@ -25,16 +25,6 @@ export interface HabitLog {
   timestamp: number; // Date.now()
 }
 
-export interface TaskItem {
-  id?: number;
-  title: string;
-  date: string; // YYYY-MM-DD
-  startTime?: string; // HH:mm format
-  durationMinutes: number;
-  completed: boolean;
-  createdAt: string; // ISO String
-}
-
 export interface BreathingLog {
   id?: number;
   exerciseId: string;
@@ -50,11 +40,12 @@ export interface UserProfile {
   streakFreezes: number;
   defaultBreathingId: string;
   preferredSessionMinutes: number;
-  theme: 'dark' | 'light';
-  language?: 'en' | 'lt';
+  theme: "dark" | "light";
+  language?: "en" | "lt";
+  vibrationEnabled?: boolean;
 }
 
-export type BreathingExerciseId = 'box' | 'relax_478' | 'wim_hof' | 'coherent_55' | 'physio_sigh';
+export type BreathingExerciseId = "box" | "relax_478" | "wim_hof" | "coherent_55" | "physio_sigh";
 
 export interface BreathingStandard {
   id: BreathingExerciseId;
@@ -71,6 +62,6 @@ export interface DatabaseBackup {
   userProfile: UserProfile[];
   habits: Habit[];
   habitLogs: HabitLog[];
-  tasks: TaskItem[];
+  tasks?: unknown[];
   breathingLogs: BreathingLog[];
 }

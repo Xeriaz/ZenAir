@@ -19,7 +19,6 @@ export interface TranslationSchema {
   };
   nav: {
     habits: string;
-    tasks: string;
     breathing: string;
     analytics: string;
     settings: string;
@@ -60,26 +59,7 @@ export interface TranslationSchema {
     daysWeekdays: string;
     daysWeekends: string;
     restDay: string;
-    habitBadge: string;
-    timelineSchedule: string;
     modalSaving: string;
-    deleteConfirm: string;
-  };
-  tasks: {
-    title: string;
-    completedBlocks: string;
-    addPlaceholder: string;
-    blockBtn: string;
-    startLabel: string;
-    durationLabel: string;
-    min15: string;
-    min30: string;
-    min45: string;
-    min60: string;
-    min90: string;
-    min120: string;
-    noTasksTitle: string;
-    noTasksDesc: string;
     deleteConfirm: string;
   };
   breathing: {
@@ -103,6 +83,9 @@ export interface TranslationSchema {
     holdOnEmptyRelax: string;
     recoveryHold: string;
     inhaleFullAndHold15s: string;
+    vibrationEnableTooltip: string;
+    vibrationDisableTooltip: string;
+    vibrationLabel: string;
     standards: Record<
       BreathingExerciseId,
       {
@@ -116,7 +99,6 @@ export interface TranslationSchema {
   };
   analytics: {
     habitsDone: string;
-    tasksDone: string;
     calmTime: string;
     consistencyAndCompletion: string;
     days7: string;
@@ -177,6 +159,13 @@ export interface TranslationSchema {
     importError: string;
     invalidBackupFile: string;
     appArchitecture: string;
+    vibrationTitle: string;
+    vibrationDesc: string;
+    vibrationToggleLabel: string;
+    vibrationTestBtn: string;
+    vibrationTestSuccess: string;
+    vibrationSupported: string;
+    vibrationUnsupported: string;
   };
 }
 
@@ -198,7 +187,6 @@ export const translations: Record<Language, TranslationSchema> = {
     },
     nav: {
       habits: 'Habits',
-      tasks: 'Timeline',
       breathing: 'Breathe',
       analytics: 'Analytics',
       settings: 'Settings'
@@ -239,27 +227,8 @@ export const translations: Record<Language, TranslationSchema> = {
       daysWeekdays: 'Weekdays',
       daysWeekends: 'Weekends',
       restDay: 'Rest day',
-      habitBadge: 'Habit',
-      timelineSchedule: 'Timeline & Schedule',
       modalSaving: 'Saving...',
       deleteConfirm: 'Are you sure you want to delete this habit?'
-    },
-    tasks: {
-      title: 'Time-Blocked Timeline',
-      completedBlocks: 'Done ({completed} / {total})',
-      addPlaceholder: 'Plan a time-blocked task (e.g. Deep Work Sprint)...',
-      blockBtn: 'Block',
-      startLabel: 'Start:',
-      durationLabel: 'Duration:',
-      min15: '15 min',
-      min30: '30 min',
-      min45: '45 min',
-      min60: '60 min',
-      min90: '90 min',
-      min120: '2 hours',
-      noTasksTitle: 'No time blocks scheduled for today',
-      noTasksDesc: 'Add your first task block above to structure your day with intention.',
-      deleteConfirm: 'Delete this scheduled block?'
     },
     breathing: {
       selectMethod: 'Select Breathing Method',
@@ -282,6 +251,9 @@ export const translations: Record<Language, TranslationSchema> = {
       holdOnEmptyRelax: 'Hold on Empty — Relax',
       recoveryHold: 'Recovery Hold',
       inhaleFullAndHold15s: 'Inhale Full & Hold 15s',
+      vibrationEnableTooltip: 'Enable vibration cues',
+      vibrationDisableTooltip: 'Disable vibration cues',
+      vibrationLabel: 'Vibration',
       standards: {
         box: {
           name: 'Box Breathing',
@@ -341,7 +313,6 @@ export const translations: Record<Language, TranslationSchema> = {
     },
     analytics: {
       habitsDone: 'Habits Done',
-      tasksDone: 'Tasks Done',
       calmTime: 'Calm Time',
       consistencyAndCompletion: 'Consistency & Completion',
       days7: '7 Days',
@@ -377,10 +348,10 @@ export const translations: Record<Language, TranslationSchema> = {
       importJson: 'Import JSON',
       importing: 'Importing...',
       resetTitle: 'Reset All Data',
-      resetDesc: 'Erase all habits, time-blocked tasks, habit history, and breathing logs, restoring your profile to a clean initial state.',
+      resetDesc: 'Erase all habits, habit history, and breathing logs, restoring your profile to a clean initial state.',
       resetBtn: 'Reset All Data',
       resetting: 'Resetting Data...',
-      resetConfirm: 'Are you sure you want to reset all data? This will permanently delete all habits, time-blocked tasks, logs, and reset your user profile. This action cannot be undone.',
+      resetConfirm: 'Are you sure you want to reset all data? This will permanently delete all habits, logs, and reset your user profile. This action cannot be undone.',
       resetSuccess: 'All data has been reset to a clean state!',
       resetError: 'Failed to reset all data.',
       sampleDemoTitle: 'Sample & Demo Data',
@@ -401,7 +372,14 @@ export const translations: Record<Language, TranslationSchema> = {
       importSuccess: 'Data restored successfully! Refreshing UI...',
       importError: 'Import failed:',
       invalidBackupFile: 'Invalid backup JSON file',
-      appArchitecture: 'ZenAir PWA • Local-First Architecture'
+      appArchitecture: 'ZenAir PWA • Local-First Architecture',
+      vibrationTitle: 'Haptics & Vibration',
+      vibrationDesc: 'Tactile vibration cues on breathing phase transitions (Inhale, Hold, Exhale) so you can keep your eyes closed during exercises.',
+      vibrationToggleLabel: 'Breathing Phase Vibration',
+      vibrationTestBtn: 'Test Vibration Pulse',
+      vibrationTestSuccess: 'Vibration pulse triggered!',
+      vibrationSupported: 'Supported on this device (Android / Web Vibration API)',
+      vibrationUnsupported: 'Vibration API is not supported by your current browser/device (e.g. iOS Safari/WebKit does not allow Vibration API in web apps).'
     }
   },
   lt: {
@@ -421,7 +399,6 @@ export const translations: Record<Language, TranslationSchema> = {
     },
     nav: {
       habits: 'Įpročiai',
-      tasks: 'Dienotvarkė',
       breathing: 'Kvėpuoti',
       analytics: 'Analitika',
       settings: 'Nustatymai'
@@ -462,27 +439,8 @@ export const translations: Record<Language, TranslationSchema> = {
       daysWeekdays: 'Darbo d.',
       daysWeekends: 'Savaitgaliai',
       restDay: 'Poilsio d.',
-      habitBadge: 'Įprotis',
-      timelineSchedule: 'Dienotvarkė ir laikas',
       modalSaving: 'Išsaugoma...',
       deleteConfirm: 'Ar tikrai norite ištrinti šį įprotį?'
-    },
-    tasks: {
-      title: 'Suplanuota dienotvarkė',
-      completedBlocks: 'Atlikta ({completed} iš {total})',
-      addPlaceholder: 'Suplanuokite laiko bloką (pvz., Gilus darbas)...',
-      blockBtn: 'Pridėti bloką',
-      startLabel: 'Pradžia:',
-      durationLabel: 'Trukmė:',
-      min15: '15 min',
-      min30: '30 min',
-      min45: '45 min',
-      min60: '60 min (1 val.)',
-      min90: '90 min (1.5 val.)',
-      min120: '2 valandos',
-      noTasksTitle: 'Šiandienai laiko blokų dar nesuplanuota',
-      noTasksDesc: 'Pridėkite pirmąjį laiko bloką aukščiau ir sąmoningai suplanuokite savo dieną.',
-      deleteConfirm: 'Ištrinti šį suplanuotą bloką?'
     },
     breathing: {
       selectMethod: 'Pasirinkite kvėpavimo metodą',
@@ -496,7 +454,7 @@ export const translations: Record<Language, TranslationSchema> = {
       reset: 'Atstatyti',
       about: 'Apie',
       sessionCompletedTitle: 'Sesija baigta!',
-      sessionCompletedDesc: 'Sumažinote nervų sistemos įtampą ir padidinote širdies ritmo koherentiškumą.',
+      sessionCompletedDesc: 'Sumažinote nervų sistemos įtampą ir padidinote širdies ritmo kohentiškumą.',
       continueJourney: 'Tęsti kelionę',
       cycleOf: 'Ciklas',
       powerInhale: 'Gilus įkvėpimas',
@@ -505,6 +463,9 @@ export const translations: Record<Language, TranslationSchema> = {
       holdOnEmptyRelax: 'Sulaikykite iškvėpę — atsipalaiduokite',
       recoveryHold: 'Atstatomasis sulaikymas',
       inhaleFullAndHold15s: 'Giliai įkvėpkite ir sulaikykite 15s',
+      vibrationEnableTooltip: 'Įjungti vibracijos signalus',
+      vibrationDisableTooltip: 'Išjungti vibracijos signalus',
+      vibrationLabel: 'Vibracija',
       standards: {
         box: {
           name: 'Kvadratinis kvėpavimas',
@@ -542,7 +503,7 @@ export const translations: Record<Language, TranslationSchema> = {
         coherent_55: {
           name: 'Koherentinis (Tolygus) 5-5',
           tagline: 'Širdies ir kvėpavimo rezonansinis ritmas',
-          description: 'Kvėpavimas maždaug 6 kartus per minutę. Suderina širdies ritmą, kraujospūdį ir smegenų bangas optimaliam koherentiškumui.',
+          description: 'Kvėpavimas maždaug 6 kartus per minutę. Suderina širdies ritmą, kraujospūdį ir smegenų bangas optimaliam kohentiškumui.',
           benefits: ['Optimalus širdies ritmo kintamumas (HRV)', 'Emocinė pusiausvyra ir vidinė ramybė', 'Tolygi rami koncentracija dirbant'],
           steps: [
             { name: 'Įkvėpimas', cue: 'Tolygus nepertraukiamas įkvėpimas' },
@@ -564,7 +525,6 @@ export const translations: Record<Language, TranslationSchema> = {
     },
     analytics: {
       habitsDone: 'Atlikti įpročiai',
-      tasksDone: 'Atliktos užduotys',
       calmTime: 'Ramybės laikas',
       consistencyAndCompletion: 'Nuoseklumas ir atlikimas',
       days7: '7 dienos',
@@ -600,10 +560,10 @@ export const translations: Record<Language, TranslationSchema> = {
       importJson: 'Importuoti JSON',
       importing: 'Importuojama...',
       resetTitle: 'Išvalyti visus duomenis',
-      resetDesc: 'Ištrinkite visus įpročius, suplanuotus laiko blokus, istorijos žurnalus ir grąžinkite profilį į švarią pradinę būseną.',
+      resetDesc: 'Ištrinkite visus įpročius, istorijos žurnalus ir grąžinkite profilį į švarią pradinę būseną.',
       resetBtn: 'Išvalyti visus duomenis',
       resetting: 'Valomi duomenys...',
-      resetConfirm: 'Ar tikrai norite išvalyti visus duomenis? Tai visam laikui ištrins visus įpročius, laiko blokus, istoriją ir atstatys jūsų profilį. Šio veiksmo negalima atšaukti.',
+      resetConfirm: 'Ar tikrai norite išvalyti visus duomenis? Tai visam laikui ištrins visus įpročius, istoriją ir atstatys jūsų profilį. Šio veiksmo negalima atšaukti.',
       resetSuccess: 'Visi duomenys sėkmingai išvalyti!',
       resetError: 'Nepavyko išvalyti duomenų.',
       sampleDemoTitle: 'Pavyzdiniai ir demonstraciniai duomenys',
@@ -613,7 +573,7 @@ export const translations: Record<Language, TranslationSchema> = {
       generateDemoSuccess: 'Sugeneruota ~50 dienų sekimo duomenų ir analitikos istorija!',
       generateDemoError: 'Nepavyko sugeneruoti demonstracinių duomenų.',
       loadSampleHabitsBtn: 'Įkelti pradinius pavyzdinius įpročius',
-      loadSampleConfirm: 'Įkelti rekomenduojamus pradinius įpročius? Tai papildys jūsų dienotvarkę standartiniais įpročiais.',
+      loadSampleConfirm: 'Įkelti rekomenduojamus pradinius įpročius? Tai papildys jūsų sąrašą standartiniais įpročiais.',
       loadSampleSuccess: 'Rekomenduojami pradiniai įpročiai įkelti!',
       securityModalTitle: 'Saugumo patvirtinimas',
       securityModalDesc: 'Generuojant demonstracinius duomenis bus sukurta ~50 d. istorija. Įveskite slaptažodį test patvirtinimui.',
@@ -624,7 +584,14 @@ export const translations: Record<Language, TranslationSchema> = {
       importSuccess: 'Duomenys sėkmingai atkurti! Puslapis perkraunamas...',
       importError: 'Importavimas nepavyko:',
       invalidBackupFile: 'Neteisingas atsarginės kopijos JSON failas',
-      appArchitecture: 'ZenAir PWA • Vietinė architektūra'
+      appArchitecture: 'ZenAir PWA • Vietinė architektūra',
+      vibrationTitle: 'Haptiniai signalai ir vibracija',
+      vibrationDesc: 'Švelnus vibravimas keičiantis kvėpavimo fazėms (įkvėpimas, sulaikymas, iškvėpimas), leidžiantis atlikti pratimus užsimerkus.',
+      vibrationToggleLabel: 'Kvėpavimo fazių vibracija',
+      vibrationTestBtn: 'Išbandyti vibracijos impulsą',
+      vibrationTestSuccess: 'Vibracijos impulsas išsiųstas!',
+      vibrationSupported: 'Palaikoma šiame įrenginyje (Android / Web Vibration API)',
+      vibrationUnsupported: 'Vibracijos API nepalaikoma šioje naršyklėje/įrenginyje (pvz. iOS Safari/WebKit riboja vibraciją žiniatinklio programėlėse).'
     }
   }
 };

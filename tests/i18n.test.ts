@@ -11,7 +11,6 @@ describe('i18n Localization Engine', () => {
 
       // Navigation
       expect(t.nav.habits).toBeTruthy();
-      expect(t.nav.tasks).toBeTruthy();
       expect(t.nav.breathing).toBeTruthy();
       expect(t.nav.analytics).toBeTruthy();
       expect(t.nav.settings).toBeTruthy();
@@ -20,10 +19,6 @@ describe('i18n Localization Engine', () => {
       expect(t.habits.todayHabits).toBeTruthy();
       expect(t.habits.quickAddPlaceholder).toBeTruthy();
       expect(t.habits.modalHabitTitle).toBeTruthy();
-
-      // Tasks
-      expect(t.tasks.title).toBeTruthy();
-      expect(t.tasks.blockBtn).toBeTruthy();
 
       // Breathing
       expect(t.breathing.sessionCompletedTitle).toBeTruthy();

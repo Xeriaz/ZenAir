@@ -16,7 +16,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { BarChart3, PieChart as PieIcon, Flame, Calendar, Award, Wind, CheckCircle2 } from 'lucide-react';
+import { BarChart3, PieChart as PieIcon, Flame, Calendar, Award, Wind } from 'lucide-react';
 import { db } from '../../db/db';
 import { getLastNDaysDateStrings, get90DayGridDates, formatReadableDate } from '../../utils/dates';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -33,17 +33,12 @@ export const AnalyticsView: React.FC = () => {
     return await db.habitLogs.toArray();
   }, []);
 
-  const tasks = useLiveQuery(async () => {
-    return await db.tasks.toArray();
-  }, []);
-
   const breathingLogs = useLiveQuery(async () => {
     return await db.breathingLogs.toArray();
   }, []);
 
   const activeHabits = habits ?? [];
   const allLogs = habitLogs ?? [];
-  const allTasks = tasks ?? [];
   const allBreathing = breathingLogs ?? [];
 
   // Group logs by date
@@ -104,7 +99,6 @@ export const AnalyticsView: React.FC = () => {
 
   // High-level metrics
   const totalCompletedHabits = allLogs.reduce((acc, log) => acc + (log.count > 0 ? 1 : 0), 0);
-  const totalCompletedTasks = allTasks.filter(t => t.completed).length;
   const totalBreathingMinutes = Math.round(
     allBreathing.reduce((acc, b) => acc + b.durationSeconds, 0) / 60
   );
@@ -112,21 +106,13 @@ export const AnalyticsView: React.FC = () => {
   return (
     <div className="flex flex-col gap-5 max-w-2xl mx-auto px-4 pt-3 pb-8">
       {/* Metrics Row */}
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5">
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
           <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
             <Flame className="w-3.5 h-3.5 text-amber-400" />
             <span>{t.analytics.habitsDone}</span>
           </div>
           <span className="text-xl font-bold text-white tracking-tight">{totalCompletedHabits}</span>
-        </div>
-
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">
-          <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium">
-            <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{t.analytics.tasksDone}</span>
-          </div>
-          <span className="text-xl font-bold text-cyan-300 tracking-tight">{totalCompletedTasks}</span>
         </div>
 
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col gap-1 shadow-sm">

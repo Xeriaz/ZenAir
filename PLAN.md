@@ -1,6 +1,6 @@
 # ZenAir PWA — Implementation & Architectural Plan
 
-A production-ready, local-first Progressive Web App (PWA) for **Habit Tracking, Time Planning, and Stress Relief**, engineered with **React 19**, **TypeScript**, **Tailwind CSS v4**, **Dexie.js (IndexedDB)**, and **Recharts**.
+A production-ready, local-first Progressive Web App (PWA) for **Habit Tracking and Stress Relief**, engineered with **React 19**, **TypeScript**, **Tailwind CSS v4**, **Dexie.js (IndexedDB)**, and **Recharts**.
 
 ---
 
@@ -13,7 +13,7 @@ A production-ready, local-first Progressive Web App (PWA) for **Habit Tracking, 
 | **Styling & UI** | Tailwind CSS `^4.0.9` (`@tailwindcss/vite`), `lucide-react` `^1.16.0` | Dark-mode native palette, CSS custom properties, Lucide icons |
 | **Typography** | Google Fonts `Roboto` (300, 400, 500, 700) | Loaded in `index.html`, set as global `font-sans` |
 | **Local Database** | `dexie` `^4.0.11`, `dexie-react-hooks` `^1.1.7` | Zero external backend, reactive `useLiveQuery` UI updates |
-| **Date & Time** | `date-fns` `^4.1.0` | Streak calculations, daily resets, heatmaps, time-block groupings |
+| **Date & Time** | `date-fns` `^4.1.0` | Streak calculations, daily resets, heatmaps, day-of-week groupings |
 | **Visualizations**| `recharts` `^2.15.1` | Responsive Bar, Area, Pie, Radar charts, custom SVG Heatmap |
 | **PWA / Offline**| `vite-plugin-pwa` `^0.21.1`, `workbox-window` `^7.3.0` | Offline caching, `display: 'standalone'`, dark theme color |
 | **Testing** | `vitest` `^5.0.5`, `jsdom` `^30.1.3`, `@testing-library/react` `^16.3.3`, `fake-indexeddb` `^6.2.6` | In-memory Dexie testing, calculation unit tests, component tests |
@@ -42,9 +42,6 @@ ZenAir/
 │   │   │   ├── HabitCard.tsx          # 1-tap completion & +/- buttons
 │   │   │   ├── HabitList.tsx          # Time-of-day grouped lists
 │   │   │   └── HabitFormModal.tsx     # Advanced edit / difficulty settings
-│   │   ├── tasks/
-│   │   │   ├── TaskTimeline.tsx       # Daily time-blocked schedule
-│   │   │   └── TaskQuickAdd.tsx       # Inline task creation
 │   │   ├── analytics/
 │   │   │   ├── CompletionChart.tsx    # 7-day & 30-day Area / Bar chart
 │   │   │   ├── TimeDistribution.tsx   # Radar / Pie chart of habit balance
@@ -93,6 +90,12 @@ db.version(1).stores({
   breathingLogs: '++id, exerciseId, durationSeconds, completedAt',
   userProfile: '++id, level, xp, gold, streakFreezes, defaultBreathingId, preferredSessionMinutes, theme'
 });
+db.version(2).stores({
+  habitLogs: '++id, habitId, date, count, xpEarned, timestamp, &[habitId+date]'
+});
+db.version(3).stores({
+  tasks: null
+});
 ```
 
 ### Gamification & State Mechanics
@@ -113,7 +116,7 @@ db.version(1).stores({
 ## 4. Breathing Pacer Architecture (60fps Non-Jank)
 
 To guarantee 60fps performance without main-thread jank:
-1. **Zero JS animation frame rendering:** React does not manage scale/opacity tick-by-tick via `requestAnimationFrame` or `setInterval`.
+1. **Zero JS animation frame rendering:** React does not manage scale/opacity tick-by-tick via `requestAnimationFrame` or `setInterval`.\
 2. **Pure CSS Animation Engine:**
    - Single CSS class per phase (`.inhale`, `.hold`, `.exhale`, `.hold-empty`, `.recovery`).
    - Dynamic CSS variables set on the parent element:
@@ -150,7 +153,7 @@ To guarantee 60fps performance without main-thread jank:
   - 1-tap completion toggles with instant optimistic `useLiveQuery` updates.
   - Positive/Negative (+/-) reinforcement habits.
   - Time-of-day tabs/filters (`Morning`, `Afternoon`, `Evening`, `Anytime`).
-  - Daily timeline view for scheduled tasks.
+  - Day-of-week custom scheduling.
 - Settings view with JSON backup & restore utilities.
 
 ### Phase 3: Visual Analytics & Diagrams

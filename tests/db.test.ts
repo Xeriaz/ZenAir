@@ -6,7 +6,6 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
     await db.userProfile.clear();
     await db.habits.clear();
     await db.habitLogs.clear();
-    await db.tasks.clear();
     await db.breathingLogs.clear();
   });
 
@@ -26,9 +25,6 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
     const logs = await db.habitLogs.toArray();
     expect(logs.length).toBe(0);
 
-    const tasks = await db.tasks.toArray();
-    expect(tasks.length).toBe(0);
-
     const breathing = await db.breathingLogs.toArray();
     expect(breathing.length).toBe(0);
   });
@@ -44,14 +40,6 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
       difficulty: 'easy',
       createdAt: new Date().toISOString(),
       archived: false
-    });
-    await db.tasks.add({
-      title: 'Temporary Task',
-      date: '2026-10-26',
-      startTime: '10:00',
-      durationMinutes: 45,
-      completed: true,
-      createdAt: new Date().toISOString()
     });
     await db.habitLogs.add({
       habitId: 1,
@@ -77,7 +65,6 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
     });
 
     expect(await db.habits.count()).toBe(1);
-    expect(await db.tasks.count()).toBe(1);
     expect(await db.habitLogs.count()).toBe(1);
     expect(await db.breathingLogs.count()).toBe(1);
 
@@ -86,7 +73,6 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
 
     // Verify all tables are cleared
     expect(await db.habits.count()).toBe(0);
-    expect(await db.tasks.count()).toBe(0);
     expect(await db.habitLogs.count()).toBe(0);
     expect(await db.breathingLogs.count()).toBe(0);
 
@@ -127,7 +113,7 @@ describe('ZenAir Database Layer (Dexie.js + fake-indexeddb)', () => {
   });
 
   it('should accurately serialize to JSON and restore from JSON backup', async () => {
-    // Add sample habit and task
+    // Add sample habit and user profile
     await db.userProfile.put({
       id: 1,
       level: 4,

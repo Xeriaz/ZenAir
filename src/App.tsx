@@ -1,31 +1,30 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { Header } from './components/common/Header';
-import { BottomNav, type NavTab } from './components/common/BottomNav';
-import { HabitList } from './components/habits/HabitList';
-import { TaskTimeline } from './components/tasks/TaskTimeline';
-import { initializeDatabase } from './db/db';
-import { LanguageProvider, useTranslation } from './i18n/LanguageContext';
+import React, { useState, useEffect, Suspense, lazy } from "react";
+import { Header } from "./components/common/Header";
+import { BottomNav, type NavTab } from "./components/common/BottomNav";
+import { HabitList } from "./components/habits/HabitList";
+import { initializeDatabase } from "./db/db";
+import { LanguageProvider, useTranslation } from "./i18n/LanguageContext";
 
 const BreathingView = lazy(() =>
-  import('./components/breathing/BreathingView').then((m) => ({ default: m.BreathingView }))
+  import("./components/breathing/BreathingView").then((m) => ({ default: m.BreathingView }))
 );
 const AnalyticsView = lazy(() =>
-  import('./components/analytics/AnalyticsView').then((m) => ({ default: m.AnalyticsView }))
+  import("./components/analytics/AnalyticsView").then((m) => ({ default: m.AnalyticsView }))
 );
 const SettingsView = lazy(() =>
-  import('./components/settings/SettingsView').then((m) => ({ default: m.SettingsView }))
+  import("./components/settings/SettingsView").then((m) => ({ default: m.SettingsView }))
 );
 
 const AppContent: React.FC = () => {
   const { t } = useTranslation();
-  const [currentTab, setCurrentTab] = useState<NavTab>('habits');
+  const [currentTab, setCurrentTab] = useState<NavTab>("habits");
   const [isDbReady, setIsDbReady] = useState(false);
 
   useEffect(() => {
     initializeDatabase()
       .then(() => setIsDbReady(true))
       .catch((err) => {
-        console.error('Failed to initialize database:', err);
+        console.error("Failed to initialize database:", err);
         setIsDbReady(true);
       });
   }, []);
@@ -48,19 +47,18 @@ const AppContent: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full">
-        {currentTab === 'habits' && <HabitList />}
-        {currentTab === 'tasks' && <TaskTimeline />}
-        {currentTab === 'breathing' && (
+        {currentTab === "habits" && <HabitList />}
+        {currentTab === "breathing" && (
           <Suspense fallback={<div className="text-center py-24 text-xs text-slate-500">{t.common.loadingBreathing}</div>}>
             <BreathingView />
           </Suspense>
         )}
-        {currentTab === 'analytics' && (
+        {currentTab === "analytics" && (
           <Suspense fallback={<div className="text-center py-24 text-xs text-slate-500">{t.common.loadingAnalytics}</div>}>
             <AnalyticsView />
           </Suspense>
         )}
-        {currentTab === 'settings' && (
+        {currentTab === "settings" && (
           <Suspense fallback={<div className="text-center py-24 text-xs text-slate-500">{t.common.loadingSettings}</div>}>
             <SettingsView />
           </Suspense>

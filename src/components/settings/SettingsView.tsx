@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Download, Upload, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles, Trash2, Lock, X, Globe } from 'lucide-react';
+import { Download, Upload, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles, Trash2, Lock, X, Globe, Vibrate } from 'lucide-react';
+import { useGamification } from '../../hooks/useGamification';
+import { isVibrationSupported, triggerVibration, HAPTIC_PATTERNS } from '../../utils/haptics';
 import { downloadDatabaseBackup, importDatabaseFromJson, db, INITIAL_HABITS, resetAllDatabaseData } from '../../db/db';
 import { generate50DaysDemoData } from '../../db/seedData';
 import type { Habit } from '../../types';
@@ -7,6 +9,27 @@ import { useTranslation } from '../../i18n/LanguageContext';
 
 export const SettingsView: React.FC = () => {
   const { t, language, setLanguage } = useTranslation();
+  const { profile, updatePreferences } = useGamification();
+  const vibrationEnabled = profile.vibrationEnabled !== false;
+  const hasVibrationSupport = isVibrationSupported();
+
+  const handleToggleVibration = async (enabled: boolean) => {
+    await updatePreferences({ vibrationEnabled: enabled });
+    if (enabled) {
+      triggerVibration(HAPTIC_PATTERNS.testPulse);
+    }
+  };
+
+  const handleTestVibration = () => {
+    if (hasVibrationSupport) {
+      triggerVibration(HAPTIC_PATTERNS.testPulse);
+      setStatusMessage({ text: t.settings.vibrationTestSuccess });
+      setTimeout(() => setStatusMessage(null), 3000);
+    } else {
+      setStatusMessage({ text: t.settings.vibrationUnsupported, isError: true });
+      setTimeout(() => setStatusMessage(null), 4000);
+    }
+  };
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError?: boolean } | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -148,6 +171,63 @@ export const SettingsView: React.FC = () => {
             }`}
           >
             <span>🇱🇹 {t.settings.lithuanian}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Haptics & Vibration Settings */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Vibrate className="w-5 h-5 text-cyan-400" />
+            <h3 className="text-sm font-bold text-white tracking-tight">{t.settings.vibrationTitle}</h3>
+          </div>
+          {/* Toggle Switch */}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={vibrationEnabled}
+            onClick={() => handleToggleVibration(!vibrationEnabled)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+              vibrationEnabled ? 'bg-cyan-500' : 'bg-slate-700'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                vibrationEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        <p className="text-xs text-slate-400 leading-relaxed">
+          {t.settings.vibrationDesc}
+        </p>
+
+        {/* Device support banner */}
+        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px]">
+          {hasVibrationSupport ? (
+            <span className="text-emerald-400 font-medium flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+              {t.settings.vibrationSupported}
+            </span>
+          ) : (
+            <span className="text-amber-400/90 font-medium flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
+              {t.settings.vibrationUnsupported}
+            </span>
+          )}
+        </div>
+
+        {/* Test vibration button */}
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={handleTestVibration}
+            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700/80 active:scale-95 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Vibrate className="w-4 h-4 text-cyan-400" />
+            <span>{t.settings.vibrationTestBtn}</span>
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { subDays, format } from 'date-fns';
 import { db, INITIAL_USER_PROFILE, INITIAL_HABITS } from './db';
-import type { Habit, HabitLog, TaskItem, BreathingLog, BreathingExerciseId } from '../types';
+import type { Habit, HabitLog, BreathingLog, BreathingExerciseId } from '../types';
 import { calculateStatsUpdate, getRewardsForDifficulty } from '../utils/gamification';
 import { isHabitScheduledForToday } from '../utils/dates';
 
@@ -42,23 +42,13 @@ const EXTRA_SAMPLE_HABITS: Omit<Habit, 'id'>[] = [
   }
 ];
 
-const SAMPLE_TASKS_TITLES = [
-  'Deep Focus Architecture Sprint',
-  'Code Review & Refactoring',
-  'Team Sync & Strategy Planning',
-  'Read 20 Pages Non-fiction',
-  'Evening Mobility & Foam Roll',
-  'Weekly Goal Review & Journal',
-  'Inbox Zero & Clean Workspace'
-];
-
 const BREATHING_IDS: BreathingExerciseId[] = ['box', 'relax_478', 'wim_hof', 'coherent_55', 'physio_sigh'];
 
 /**
- * Generates ~50 days of realistic history for habits, breathing sessions, and tasks.
+ * Generates ~50 days of realistic history for habits and breathing sessions.
  */
 export async function generate50DaysDemoData(): Promise<void> {
-  await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.tasks, db.breathingLogs], async () => {
+  await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.breathingLogs], async () => {
     // 1. Ensure habits exist
     let habits = await db.habits.toArray();
     if (habits.length === 0) {
@@ -73,11 +63,9 @@ export async function generate50DaysDemoData(): Promise<void> {
     // 2. Clear old logs before generating fresh ~50 days history
     await db.habitLogs.clear();
     await db.breathingLogs.clear();
-    await db.tasks.clear();
 
     const habitLogs: HabitLog[] = [];
     const breathingLogs: BreathingLog[] = [];
-    const taskItems: TaskItem[] = [];
 
     let totalXpEarned = 0;
     let totalGoldEarned = 0;
@@ -156,31 +144,6 @@ export async function generate50DaysDemoData(): Promise<void> {
         totalXpEarned += 50;
         totalGoldEarned += 15;
       }
-
-      // Add 2-3 daily tasks for the past 7 days and today
-      if (dayOffset <= 7) {
-        const taskCount = 2 + (dayOffset % 2);
-        for (let t = 0; t < taskCount; t++) {
-          const title = SAMPLE_TASKS_TITLES[(dayOffset * 2 + t) % SAMPLE_TASKS_TITLES.length];
-          const startHours = 9 + t * 3;
-          const startStr = `${startHours < 10 ? '0' : ''}${startHours}:00`;
-          const isTaskDone = dayOffset > 0 ? ((dayOffset + t) % 4 !== 0) : t === 0;
-
-          if (isTaskDone) {
-            totalXpEarned += 15;
-            totalGoldEarned += 5;
-          }
-
-          taskItems.push({
-            title,
-            date: dateStr,
-            startTime: startStr,
-            durationMinutes: 30 + (t % 2) * 15,
-            completed: isTaskDone,
-            createdAt: dayDate.toISOString()
-          });
-        }
-      }
     }
 
     // 3. Update habit records with their calculated streaks
@@ -199,7 +162,6 @@ export async function generate50DaysDemoData(): Promise<void> {
     // 4. Save bulk logs
     await db.habitLogs.bulkAdd(habitLogs);
     await db.breathingLogs.bulkAdd(breathingLogs);
-    await db.tasks.bulkAdd(taskItems);
 
     // 5. Update user profile to reflect all accumulated XP & Gold
     let profile = (await db.userProfile.toCollection().first()) ?? INITIAL_USER_PROFILE;

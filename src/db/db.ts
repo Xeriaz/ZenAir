@@ -1,10 +1,9 @@
 import Dexie, { type Table } from 'dexie';
-import type { Habit, HabitLog, TaskItem, BreathingLog, UserProfile, DatabaseBackup } from '../types';
+import type { Habit, HabitLog, BreathingLog, UserProfile, DatabaseBackup } from '../types';
 
 export class ZenAirDatabase extends Dexie {
   habits!: Table<Habit, number>;
   habitLogs!: Table<HabitLog, number>;
-  tasks!: Table<TaskItem, number>;
   breathingLogs!: Table<BreathingLog, number>;
   userProfile!: Table<UserProfile, number>;
 
@@ -20,6 +19,9 @@ export class ZenAirDatabase extends Dexie {
     this.version(2).stores({
       habitLogs: '++id, habitId, date, count, xpEarned, timestamp, &[habitId+date]'
     });
+    this.version(3).stores({
+      tasks: null
+    });
   }
 }
 
@@ -33,7 +35,8 @@ export const INITIAL_USER_PROFILE: UserProfile = {
   streakFreezes: 0,
   defaultBreathingId: 'box',
   preferredSessionMinutes: 3,
-  theme: 'dark'
+  theme: 'dark',
+  vibrationEnabled: true
 };
 
 export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
@@ -110,14 +113,13 @@ export async function initializeDatabase(): Promise<void> {
 }
 
 /**
- * Resets all database tables: clears habits, habit logs, tasks, breathing logs,
+ * Resets all database tables: clears habits, habit logs, breathing logs,
  * and resets user profile to the clean initial state.
  */
 export async function resetAllDatabaseData(): Promise<void> {
-  await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.tasks, db.breathingLogs], async () => {
+  await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.breathingLogs], async () => {
     await db.habits.clear();
     await db.habitLogs.clear();
-    await db.tasks.clear();
     await db.breathingLogs.clear();
     await db.userProfile.clear();
     await db.userProfile.put(INITIAL_USER_PROFILE);
@@ -128,11 +130,10 @@ export async function resetAllDatabaseData(): Promise<void> {
  * Serializes all Dexie tables into a clean JSON string.
  */
 export async function exportDatabaseToJson(): Promise<string> {
-  const [profile, habits, habitLogs, tasks, breathingLogs] = await Promise.all([
+  const [profile, habits, habitLogs, breathingLogs] = await Promise.all([
     db.userProfile.toArray(),
     db.habits.toArray(),
     db.habitLogs.toArray(),
-    db.tasks.toArray(),
     db.breathingLogs.toArray()
   ]);
 
@@ -142,7 +143,6 @@ export async function exportDatabaseToJson(): Promise<string> {
     userProfile: profile,
     habits,
     habitLogs,
-    tasks,
     breathingLogs
   };
 
@@ -176,15 +176,6 @@ function isValidHabit(h: unknown): h is Habit {
     ((h as Habit).daysOfWeek === undefined ||
       (Array.isArray((h as Habit).daysOfWeek) &&
         (h as Habit).daysOfWeek!.every((d) => typeof d === 'number' && d >= 0 && d <= 6)))
-  );
-}
-
-function isValidTask(t: unknown): t is TaskItem {
-  return (
-    typeof t === 'object' &&
-    t !== null &&
-    typeof (t as TaskItem).title === 'string' &&
-    typeof (t as TaskItem).date === 'string'
   );
 }
 
@@ -223,10 +214,6 @@ export async function importDatabaseFromJson(jsonString: string): Promise<boolea
       throw new Error('Invalid habit records detected in backup');
     }
 
-    if (data.tasks && !data.tasks.every(isValidTask)) {
-      throw new Error('Invalid task records detected in backup');
-    }
-
     if (data.habitLogs && !data.habitLogs.every(isValidHabitLog)) {
       throw new Error('Invalid habit log records detected in backup');
     }
@@ -235,12 +222,11 @@ export async function importDatabaseFromJson(jsonString: string): Promise<boolea
       throw new Error('Invalid breathing log records detected in backup');
     }
 
-    await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.tasks, db.breathingLogs], async () => {
+    await db.transaction('rw', [db.userProfile, db.habits, db.habitLogs, db.breathingLogs], async () => {
       // Clear existing records
       await db.userProfile.clear();
       await db.habits.clear();
       await db.habitLogs.clear();
-      await db.tasks.clear();
       await db.breathingLogs.clear();
 
       // Bulk restore
@@ -256,10 +242,6 @@ export async function importDatabaseFromJson(jsonString: string): Promise<boolea
 
       if (data.habitLogs && data.habitLogs.length > 0) {
         await db.habitLogs.bulkPut(data.habitLogs);
-      }
-
-      if (data.tasks && data.tasks.length > 0) {
-        await db.tasks.bulkPut(data.tasks);
       }
 
       if (data.breathingLogs && data.breathingLogs.length > 0) {
