@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Star, Play, Pause, RotateCcw, CheckCircle, Sparkles, Info, ChevronDown, Vibrate, VibrateOff } from 'lucide-react';
+import { Star, Play, Pause, RotateCcw, CheckCircle, Sparkles, Info, ChevronDown } from 'lucide-react';
 import { BREATHING_STANDARDS } from '../../utils/breathingData';
 import type { BreathingExerciseId } from '../../types';
 import { useGamification } from '../../hooks/useGamification';
 import { db } from '../../db/db';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { triggerVibration, cancelVibration, HAPTIC_PATTERNS } from '../../utils/haptics';
 
 export const BreathingView: React.FC = () => {
   const { t } = useTranslation();
@@ -23,13 +22,6 @@ export const BreathingView: React.FC = () => {
   const [wimCycle, setWimCycle] = useState<number>(1);
   const [wimState, setWimState] = useState<'breathing' | 'retention' | 'recovery'>('breathing');
   const [retentionSeconds, setRetentionSeconds] = useState<number>(0);
-
-  const isVibrationEnabled = profile.vibrationEnabled !== false;
-  const isVibrationEnabledRef = useRef(isVibrationEnabled);
-
-  useEffect(() => {
-    isVibrationEnabledRef.current = isVibrationEnabled;
-  }, [isVibrationEnabled]);
 
   // Load default from user profile
   useEffect(() => {
@@ -56,17 +48,8 @@ export const BreathingView: React.FC = () => {
     await updatePreferences({ defaultBreathingId: selectedId });
   };
 
-  const toggleVibration = async () => {
-    const nextVal = !isVibrationEnabled;
-    await updatePreferences({ vibrationEnabled: nextVal });
-    if (nextVal) {
-      triggerVibration(HAPTIC_PATTERNS.testPulse);
-    }
-  };
-
   const resetSession = () => {
     setIsActive(false);
-    cancelVibration();
     setStepIndex(0);
     setPhaseSecondsLeft(currentStandard.steps[0]?.durationSeconds || 4);
     setTotalSecondsLeft(sessionMinutes * 60);
@@ -113,20 +96,10 @@ export const BreathingView: React.FC = () => {
                     if (c >= 30) {
                       setWimState('retention');
                       setRetentionSeconds(0);
-                      if (isVibrationEnabledRef.current) {
-                        triggerVibration(HAPTIC_PATTERNS.wimHofRetention);
-                      }
                       return 30;
-                    }
-                    if (isVibrationEnabledRef.current) {
-                      triggerVibration(HAPTIC_PATTERNS.phaseChange);
                     }
                     return c + 1;
                   });
-                } else {
-                  if (isVibrationEnabledRef.current) {
-                    triggerVibration(HAPTIC_PATTERNS.phaseChange);
-                  }
                 }
                 return nextStep;
               });
@@ -161,9 +134,6 @@ export const BreathingView: React.FC = () => {
         if (prev <= 1) {
           const nextIndex = (stepIndex + 1) % currentStandard.steps.length;
           setStepIndex(nextIndex);
-          if (isVibrationEnabledRef.current) {
-            triggerVibration(HAPTIC_PATTERNS.phaseChange);
-          }
           return currentStandard.steps[nextIndex].durationSeconds;
         }
         return prev - 1;
@@ -178,9 +148,6 @@ export const BreathingView: React.FC = () => {
   const completeSession = async () => {
     setIsActive(false);
     if (timerRef.current) clearInterval(timerRef.current);
-    if (isVibrationEnabledRef.current) {
-      triggerVibration(HAPTIC_PATTERNS.sessionComplete);
-    }
 
     const durationDone = sessionMinutes * 60 - totalSecondsLeft;
     await db.breathingLogs.add({
@@ -195,21 +162,6 @@ export const BreathingView: React.FC = () => {
   const endRetentionHold = () => {
     setWimState('recovery');
     setPhaseSecondsLeft(15);
-    if (isVibrationEnabledRef.current) {
-      triggerVibration(HAPTIC_PATTERNS.phaseChange);
-    }
-  };
-
-  const handleTogglePlay = () => {
-    const nextActive = !isActive;
-    setIsActive(nextActive);
-    if (nextActive) {
-      if (isVibrationEnabledRef.current) {
-        triggerVibration(HAPTIC_PATTERNS.sessionStart);
-      }
-    } else {
-      cancelVibration();
-    }
   };
 
   // Determine current active animation class and CSS vars
@@ -294,22 +246,9 @@ export const BreathingView: React.FC = () => {
               <button
                 onClick={toggleFavorite}
                 title={isFavorite ? t.breathing.defaultActiveTooltip : t.breathing.defaultTooltip}
-                aria-label={isFavorite ? t.breathing.defaultActiveTooltip : t.breathing.defaultTooltip}
-                className="text-amber-400 transition hover:scale-110 cursor-pointer p-0.5 rounded-lg"
+                className="text-amber-400 transition hover:scale-110 cursor-pointer"
               >
                 <Star className={`w-4 h-4 ${isFavorite ? 'fill-amber-400' : 'opacity-40'}`} />
-              </button>
-              <button
-                onClick={toggleVibration}
-                title={isVibrationEnabled ? t.breathing.vibrationDisableTooltip : t.breathing.vibrationEnableTooltip}
-                aria-label={isVibrationEnabled ? t.breathing.vibrationDisableTooltip : t.breathing.vibrationEnableTooltip}
-                className="transition hover:scale-110 cursor-pointer p-0.5 rounded-lg text-slate-400 hover:text-cyan-400"
-              >
-                {isVibrationEnabled ? (
-                  <Vibrate className="w-4 h-4 text-cyan-400" />
-                ) : (
-                  <VibrateOff className="w-4 h-4 opacity-40 hover:opacity-100 text-slate-500" />
-                )}
               </button>
             </div>
             <p className="text-[11px] text-cyan-400 font-medium">{localizedStandard.tagline}</p>
@@ -407,7 +346,7 @@ export const BreathingView: React.FC = () => {
             </button>
 
             <button
-              onClick={handleTogglePlay}
+              onClick={() => setIsActive(!isActive)}
               className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm flex items-center gap-2 shadow-xl shadow-cyan-500/25 transition active:scale-95 cursor-pointer"
             >
               {isActive ? (

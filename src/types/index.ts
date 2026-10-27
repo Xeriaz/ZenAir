@@ -42,7 +42,6 @@ export interface UserProfile {
   preferredSessionMinutes: number;
   theme: "dark" | "light";
   language?: "en" | "lt";
-  vibrationEnabled?: boolean;
 }
 
 export type BreathingExerciseId = "box" | "relax_478" | "wim_hof" | "coherent_55" | "physio_sigh";

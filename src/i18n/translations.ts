@@ -83,9 +83,6 @@ export interface TranslationSchema {
     holdOnEmptyRelax: string;
     recoveryHold: string;
     inhaleFullAndHold15s: string;
-    vibrationEnableTooltip: string;
-    vibrationDisableTooltip: string;
-    vibrationLabel: string;
     standards: Record<
       BreathingExerciseId,
       {
@@ -159,14 +156,6 @@ export interface TranslationSchema {
     importError: string;
     invalidBackupFile: string;
     appArchitecture: string;
-    vibrationTitle: string;
-    vibrationDesc: string;
-    vibrationToggleLabel: string;
-    vibrationTestBtn: string;
-    vibrationTestSuccess: string;
-    vibrationSupported: string;
-    vibrationIosSupported: string;
-    vibrationUnsupported: string;
   };
 }
 
@@ -252,9 +241,6 @@ export const translations: Record<Language, TranslationSchema> = {
       holdOnEmptyRelax: 'Hold on Empty — Relax',
       recoveryHold: 'Recovery Hold',
       inhaleFullAndHold15s: 'Inhale Full & Hold 15s',
-      vibrationEnableTooltip: 'Enable vibration cues',
-      vibrationDisableTooltip: 'Disable vibration cues',
-      vibrationLabel: 'Vibration',
       standards: {
         box: {
           name: 'Box Breathing',
@@ -374,14 +360,6 @@ export const translations: Record<Language, TranslationSchema> = {
       importError: 'Import failed:',
       invalidBackupFile: 'Invalid backup JSON file',
       appArchitecture: 'ZenAir PWA • Local-First Architecture',
-      vibrationTitle: 'Haptics & Vibration',
-      vibrationDesc: 'Tactile vibration cues on breathing phase transitions (Inhale, Hold, Exhale) so you can keep your eyes closed during exercises.',
-      vibrationToggleLabel: 'Breathing Phase Vibration',
-      vibrationTestBtn: 'Test Vibration Pulse',
-      vibrationTestSuccess: 'Vibration pulse triggered!',
-      vibrationSupported: 'Supported on this device (Android / Web Vibration API)',
-      vibrationIosSupported: 'Active via iOS Taptic Engine switch workaround',
-      vibrationUnsupported: 'Vibration API is not supported by your current browser/device (e.g. iOS Safari/WebKit does not allow Vibration API in web apps).'
     }
   },
   lt: {
@@ -465,9 +443,6 @@ export const translations: Record<Language, TranslationSchema> = {
       holdOnEmptyRelax: 'Sulaikykite iškvėpę — atsipalaiduokite',
       recoveryHold: 'Atstatomasis sulaikymas',
       inhaleFullAndHold15s: 'Giliai įkvėpkite ir sulaikykite 15s',
-      vibrationEnableTooltip: 'Įjungti vibracijos signalus',
-      vibrationDisableTooltip: 'Išjungti vibracijos signalus',
-      vibrationLabel: 'Vibracija',
       standards: {
         box: {
           name: 'Kvadratinis kvėpavimas',
@@ -587,14 +562,6 @@ export const translations: Record<Language, TranslationSchema> = {
       importError: 'Importavimas nepavyko:',
       invalidBackupFile: 'Neteisingas atsarginės kopijos JSON failas',
       appArchitecture: 'ZenAir PWA • Vietinė architektūra',
-      vibrationTitle: 'Haptiniai signalai ir vibracija',
-      vibrationDesc: 'Švelnus vibravimas keičiantis kvėpavimo fazėms (įkvėpimas, sulaikymas, iškvėpimas), leidžiantis atlikti pratimus užsimerkus.',
-      vibrationToggleLabel: 'Kvėpavimo fazių vibracija',
-      vibrationTestBtn: 'Išbandyti vibracijos impulsą',
-      vibrationTestSuccess: 'Vibracijos impulsas išsiųstas!',
-      vibrationSupported: 'Palaikoma šiame įrenginyje (Android / Web Vibration API)',
-      vibrationIosSupported: 'Aktyvu per iOS Taptic Engine sprendimą',
-      vibrationUnsupported: 'Vibracijos API nepalaikoma šioje naršyklėje/įrenginyje (pvz. iOS Safari/WebKit riboja vibraciją žiniatinklio programėlėse).'
     }
   }
 };

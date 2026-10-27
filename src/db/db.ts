@@ -35,8 +35,7 @@ export const INITIAL_USER_PROFILE: UserProfile = {
   streakFreezes: 0,
   defaultBreathingId: 'box',
   preferredSessionMinutes: 3,
-  theme: 'dark',
-  vibrationEnabled: true
+  theme: 'dark'
 };
 
 export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [

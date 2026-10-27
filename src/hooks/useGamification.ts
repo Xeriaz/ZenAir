@@ -14,7 +14,6 @@ export function useGamification() {
       defaultBreathingId: string;
       preferredSessionMinutes: number;
       theme: 'dark' | 'light';
-      vibrationEnabled: boolean;
     }>
   ) => {
     const current = (await db.userProfile.toCollection().first()) ?? INITIAL_USER_PROFILE;
