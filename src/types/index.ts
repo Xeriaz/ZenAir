@@ -8,6 +8,7 @@ export interface Habit {
   type: HabitType;
   timeOfDay: TimeOfDay;
   scheduledTime?: string; // HH:mm format (optional)
+  daysOfWeek?: number[]; // 0 = Sun, 1 = Mon, ..., 6 = Sat (defaults to everyday [0, 1, 2, 3, 4, 5, 6])
   streak: number;
   bestStreak: number;
   difficulty: HabitDifficulty;

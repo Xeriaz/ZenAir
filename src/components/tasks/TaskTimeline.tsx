@@ -1,12 +1,35 @@
 import React, { useState } from 'react';
-import { Clock, Plus, Check, Trash2, Calendar, Sparkles } from 'lucide-react';
+import { Clock, Plus, Check, Trash2, Calendar, Sparkles, Flame, Minus } from 'lucide-react';
 import { useTasks } from '../../hooks/useTasks';
-import { getTodayDateString, formatReadableDate } from '../../utils/dates';
+import { useHabits } from '../../hooks/useHabits';
+import { getTodayDateString, formatReadableDate, isHabitScheduledForToday } from '../../utils/dates';
 import { useTranslation } from '../../i18n/LanguageContext';
+import type { Habit, TaskItem } from '../../types';
+
+type TimelineItem =
+  | {
+      kind: 'task';
+      id: number;
+      title: string;
+      time: string;
+      durationMinutes: number;
+      completed: boolean;
+      task: TaskItem;
+    }
+  | {
+      kind: 'habit';
+      id: number;
+      title: string;
+      time: string;
+      completed: boolean;
+      count: number;
+      habit: Habit;
+    };
 
 export const TaskTimeline: React.FC = () => {
   const { t, language } = useTranslation();
   const { tasks, toggleTask, createTask, deleteTask } = useTasks();
+  const { habits, todayLogsMap, toggleDailyHabit, logHabitCounter } = useHabits();
   const [title, setTitle] = useState('');
   const [startTime, setStartTime] = useState('09:00');
   const [duration, setDuration] = useState('30');
@@ -32,7 +55,39 @@ export const TaskTimeline: React.FC = () => {
     }
   };
 
-  const completedCount = tasks.filter((t) => t.completed).length;
+  const taskItems: TimelineItem[] = tasks
+    .filter((task) => !!task.id)
+    .map((task) => ({
+      kind: 'task',
+      id: task.id!,
+      title: task.title,
+      time: task.startTime || '09:00',
+      durationMinutes: task.durationMinutes,
+      completed: task.completed,
+      task
+    }));
+
+  const habitItems: TimelineItem[] = habits
+    .filter((h) => !!h.id && !h.archived && !!h.scheduledTime && isHabitScheduledForToday(h.daysOfWeek))
+    .map((h) => {
+      const log = h.id ? todayLogsMap.get(h.id) : undefined;
+      const completed = !!log && log.count > 0;
+      return {
+        kind: 'habit',
+        id: h.id!,
+        title: h.title,
+        time: h.scheduledTime!,
+        completed,
+        count: log?.count ?? 0,
+        habit: h
+      };
+    });
+
+  const timelineItems: TimelineItem[] = [...taskItems, ...habitItems].sort((a, b) => {
+    return a.time.localeCompare(b.time);
+  });
+
+  const completedCount = timelineItems.filter((item) => item.completed).length;
 
   return (
     <div className="flex flex-col gap-4 max-w-2xl mx-auto px-4 pt-3 pb-8">
@@ -48,7 +103,7 @@ export const TaskTimeline: React.FC = () => {
           </div>
         </div>
         <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-          {t.tasks.completedBlocks.replace('{completed}', String(completedCount)).replace('{total}', String(tasks.length))}
+          {t.tasks.completedBlocks.replace('{completed}', String(completedCount)).replace('{total}', String(timelineItems.length))}
         </span>
       </div>
 
@@ -107,7 +162,7 @@ export const TaskTimeline: React.FC = () => {
 
       {/* Timeline List */}
       <div className="relative pl-6 flex flex-col gap-3 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-800">
-        {tasks.length === 0 ? (
+        {timelineItems.length === 0 ? (
           <div className="text-center py-12 px-4 rounded-3xl bg-slate-900/40 border border-slate-800/80 flex flex-col items-center justify-center gap-2 -ml-6">
             <Sparkles className="w-8 h-8 text-cyan-400/40" />
             <p className="text-sm font-semibold text-slate-300">{t.tasks.noTasksTitle}</p>
@@ -116,11 +171,11 @@ export const TaskTimeline: React.FC = () => {
             </p>
           </div>
         ) : (
-          tasks.map((task) => (
+          timelineItems.map((item) => (
             <div
-              key={task.id}
+              key={`${item.kind}-${item.id}`}
               className={`relative flex items-center justify-between gap-3 bg-slate-900/80 border p-3 rounded-2xl transition shadow-sm ${
-                task.completed
+                item.completed
                   ? 'border-emerald-500/30 bg-slate-900/40 text-slate-400'
                   : 'border-slate-800 hover:border-slate-700 text-slate-100'
               }`}
@@ -128,52 +183,106 @@ export const TaskTimeline: React.FC = () => {
               {/* Timeline dot */}
               <div
                 className={`absolute -left-[23px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 transition ${
-                  task.completed
+                  item.completed
                     ? 'bg-emerald-400 border-emerald-300 ring-2 ring-emerald-500/20'
-                    : 'bg-slate-900 border-cyan-400'
+                    : item.kind === 'habit'
+                    ? 'bg-slate-900 border-cyan-400'
+                    : 'bg-slate-900 border-indigo-400'
                 }`}
               />
 
-              {/* Task Details */}
+              {/* Item Details */}
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <button
-                  onClick={() => task.id && toggleTask(task.id)}
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition shrink-0 cursor-pointer ${
-                    task.completed
-                      ? 'bg-emerald-500 text-slate-950'
-                      : 'border-2 border-slate-700 hover:border-cyan-400 text-transparent'
-                  }`}
-                >
-                  <Check className="w-4 h-4 stroke-[3px]" />
-                </button>
+                {item.kind === 'task' ? (
+                  <button
+                    onClick={() => toggleTask(item.id)}
+                    aria-label={`Toggle task ${item.title}`}
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center transition shrink-0 cursor-pointer ${
+                      item.completed
+                        ? 'bg-emerald-500 text-slate-950'
+                        : 'border-2 border-slate-700 hover:border-cyan-400 text-transparent'
+                    }`}
+                  >
+                    <Check className="w-4 h-4 stroke-[3px]" />
+                  </button>
+                ) : item.habit.type === 'daily' ? (
+                  <button
+                    onClick={() => toggleDailyHabit(item.id)}
+                    aria-label={`Toggle habit ${item.title}`}
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center transition shrink-0 cursor-pointer ${
+                      item.completed
+                        ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-sm shadow-emerald-500/20 ring-2 ring-emerald-400/30'
+                        : 'border-2 border-slate-700 hover:border-cyan-400 text-transparent'
+                    }`}
+                  >
+                    <Check className="w-4 h-4 stroke-[3px]" />
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1 shrink-0 bg-slate-950/70 p-0.5 rounded-lg border border-slate-800">
+                    <button
+                      onClick={() => logHabitCounter(item.id, false)}
+                      title="Decrease count"
+                      className="w-6 h-6 rounded-md bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 flex items-center justify-center transition active:scale-90 cursor-pointer"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-5 text-center font-bold text-xs text-slate-200">{item.count}</span>
+                    <button
+                      onClick={() => logHabitCounter(item.id, true)}
+                      title="Increase count"
+                      className="w-6 h-6 rounded-md bg-emerald-500/15 hover:bg-emerald-500/30 text-emerald-400 flex items-center justify-center transition active:scale-90 cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
 
                 <div className="flex flex-col min-w-0">
                   <span
                     className={`text-sm font-medium truncate ${
-                      task.completed ? 'line-through text-slate-500' : 'text-slate-100'
+                      item.completed ? 'line-through text-slate-500' : 'text-slate-100'
                     }`}
                   >
-                    {task.title}
+                    {item.title}
                   </span>
                   <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                    <span className="text-cyan-400 font-semibold">{task.startTime}</span>
-                    <span>•</span>
-                    <span>{task.durationMinutes} min</span>
+                    <span className="text-cyan-400 font-semibold">{item.time}</span>
+                    {item.kind === 'task' ? (
+                      <>
+                        <span>•</span>
+                        <span>{item.durationMinutes} min</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>•</span>
+                        <span className="px-1.5 py-0.2 rounded-md bg-cyan-500/15 text-cyan-300 font-semibold border border-cyan-500/30 text-[10px]">
+                          {t.habits.habitBadge}
+                        </span>
+                        {item.habit.streak > 0 && (
+                          <span className="flex items-center gap-0.5 text-amber-400 font-medium">
+                            <Flame className="w-3 h-3 fill-amber-400/20" />
+                            {item.habit.streak}
+                          </span>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Delete Button */}
-              <button
-                onClick={() => {
-                  if (window.confirm(t.tasks.deleteConfirm)) {
-                    if (task.id) deleteTask(task.id);
-                  }
-                }}
-                className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition cursor-pointer"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
+              {/* Delete Button (only for tasks) */}
+              {item.kind === 'task' && (
+                <button
+                  onClick={() => {
+                    if (window.confirm(t.tasks.deleteConfirm)) {
+                      deleteTask(item.id);
+                    }
+                  }}
+                  className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           ))
         )}

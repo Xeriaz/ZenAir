@@ -55,6 +55,13 @@ export interface TranslationSchema {
     modalTimeOfDay: string;
     modalScheduledTime: string;
     modalDifficulty: string;
+    modalDaysOfWeek: string;
+    daysEveryday: string;
+    daysWeekdays: string;
+    daysWeekends: string;
+    restDay: string;
+    habitBadge: string;
+    timelineSchedule: string;
     modalSaving: string;
     deleteConfirm: string;
   };
@@ -208,7 +215,7 @@ export const translations: Record<Language, TranslationSchema> = {
       add: 'Add',
       advanced: 'Advanced',
       noHabitsTitle: 'No habits in this category yet',
-      noHabitsDesc: 'Use the quick-add bar above to create a new habit in seconds.',
+      noHabitsDesc: 'Click "+ Add" to create your first habit.',
       streak: 'Streak',
       best: 'Best',
       difficulty: 'Difficulty',
@@ -227,6 +234,13 @@ export const translations: Record<Language, TranslationSchema> = {
       modalTimeOfDay: 'Time of Day',
       modalScheduledTime: 'Scheduled Time (Optional)',
       modalDifficulty: 'Difficulty',
+      modalDaysOfWeek: 'Days of the Week',
+      daysEveryday: 'Every day',
+      daysWeekdays: 'Weekdays',
+      daysWeekends: 'Weekends',
+      restDay: 'Rest day',
+      habitBadge: 'Habit',
+      timelineSchedule: 'Timeline & Schedule',
       modalSaving: 'Saving...',
       deleteConfirm: 'Are you sure you want to delete this habit?'
     },
@@ -424,7 +438,7 @@ export const translations: Record<Language, TranslationSchema> = {
       add: 'Pridėti',
       advanced: 'Išplėstinis',
       noHabitsTitle: 'Šioje kategorijoje įpročių dar nėra',
-      noHabitsDesc: 'Pasinaudokite greito pridėjimo juosta aukščiau ir sukurkite naują įprotį per kelias sekundes.',
+      noHabitsDesc: 'Spustelėkite „+ Pridėti“, kad sukurtumėte savo pirmąjį įprotį.',
       streak: 'Serija',
       best: 'Geriausia',
       difficulty: 'Sudėtingumas',
@@ -443,6 +457,13 @@ export const translations: Record<Language, TranslationSchema> = {
       modalTimeOfDay: 'Paros laikas',
       modalScheduledTime: 'Numatytas laikas (neprivaloma)',
       modalDifficulty: 'Sudėtingumas',
+      modalDaysOfWeek: 'Savaitės dienos',
+      daysEveryday: 'Kasdien',
+      daysWeekdays: 'Darbo d.',
+      daysWeekends: 'Savaitgaliai',
+      restDay: 'Poilsio d.',
+      habitBadge: 'Įprotis',
+      timelineSchedule: 'Dienotvarkė ir laikas',
       modalSaving: 'Išsaugoma...',
       deleteConfirm: 'Ar tikrai norite ištrinti šį įprotį?'
     },

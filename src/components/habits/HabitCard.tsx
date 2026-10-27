@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Check, Flame, Plus, Minus, MoreVertical, Edit2, Trash2, Sun, Sunset, Moon, Sparkles } from 'lucide-react';
+import { Check, Flame, Plus, Minus, MoreVertical, Edit2, Trash2, Sun, Sunset, Moon, Sparkles, Calendar } from 'lucide-react';
 import type { Habit, HabitLog } from '../../types';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { formatDaysOfWeek, isHabitScheduledForToday } from '../../utils/dates';
 
 interface HabitCardProps {
   habit: Habit;
@@ -139,6 +140,19 @@ export const HabitCard: React.FC<HabitCardProps> = ({
               <TimeIcon className="w-2.5 h-2.5" />
               {habit.scheduledTime ? `${timeLabels[habit.timeOfDay]} • ${habit.scheduledTime}` : timeLabels[habit.timeOfDay]}
             </span>
+
+            {/* Days of week pill */}
+            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-800/80 text-cyan-300 font-medium border border-cyan-500/20">
+              <Calendar className="w-2.5 h-2.5 text-cyan-400" />
+              {formatDaysOfWeek(habit.daysOfWeek, language)}
+            </span>
+
+            {/* Rest day indicator if not scheduled for today */}
+            {!isHabitScheduledForToday(habit.daysOfWeek) && (
+              <span className="px-1.5 py-0.5 rounded-md bg-slate-800/60 text-slate-400 font-medium">
+                {t.habits.restDay}
+              </span>
+            )}
 
             {/* Difficulty badge */}
             <span className={`px-1.5 py-0.5 rounded-md border font-medium capitalize ${difficultyColors[habit.difficulty]}`}>

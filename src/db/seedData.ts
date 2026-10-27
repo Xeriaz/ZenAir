@@ -2,6 +2,7 @@ import { subDays, format } from 'date-fns';
 import { db, INITIAL_USER_PROFILE, INITIAL_HABITS } from './db';
 import type { Habit, HabitLog, TaskItem, BreathingLog, BreathingExerciseId } from '../types';
 import { calculateStatsUpdate, getRewardsForDifficulty } from '../utils/gamification';
+import { isHabitScheduledForToday } from '../utils/dates';
 
 const EXTRA_SAMPLE_HABITS: Omit<Habit, 'id'>[] = [
   {
@@ -9,6 +10,7 @@ const EXTRA_SAMPLE_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'morning',
     scheduledTime: '07:00',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 6,
     bestStreak: 18,
     difficulty: 'medium',
@@ -20,6 +22,7 @@ const EXTRA_SAMPLE_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'afternoon',
     scheduledTime: '17:00',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 8,
     bestStreak: 21,
     difficulty: 'hard',
@@ -30,6 +33,7 @@ const EXTRA_SAMPLE_HABITS: Omit<Habit, 'id'>[] = [
     title: 'Mindful Breathing Break',
     type: 'positive_negative',
     timeOfDay: 'anytime',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 12,
     bestStreak: 24,
     difficulty: 'easy',
@@ -96,6 +100,7 @@ export async function generate50DaysDemoData(): Promise<void> {
       for (let hIdx = 0; hIdx < habits.length; hIdx++) {
         const habit = habits[hIdx];
         if (!habit.id) continue;
+        if (!isHabitScheduledForToday(habit.daysOfWeek, dayDate)) continue;
 
         // Completion rate between 70% and 85%
         const pseudoRand = ((dayOffset * 17 + hIdx * 31) % 100) / 100;

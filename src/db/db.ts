@@ -42,6 +42,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'morning',
     scheduledTime: '07:30',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 0,
     bestStreak: 0,
     difficulty: 'easy',
@@ -53,6 +54,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'morning',
     scheduledTime: '08:00',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 0,
     bestStreak: 0,
     difficulty: 'easy',
@@ -64,6 +66,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'afternoon',
     scheduledTime: '14:00',
+    daysOfWeek: [1, 2, 3, 4, 5],
     streak: 0,
     bestStreak: 0,
     difficulty: 'medium',
@@ -74,6 +77,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     title: 'Mindful Posture & Stretch',
     type: 'positive_negative',
     timeOfDay: 'anytime',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 0,
     bestStreak: 0,
     difficulty: 'easy',
@@ -85,6 +89,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     type: 'daily',
     timeOfDay: 'evening',
     scheduledTime: '21:30',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 0,
     bestStreak: 0,
     difficulty: 'easy',
@@ -167,7 +172,10 @@ function isValidHabit(h: unknown): h is Habit {
     h !== null &&
     typeof (h as Habit).title === 'string' &&
     typeof (h as Habit).type === 'string' &&
-    typeof (h as Habit).timeOfDay === 'string'
+    typeof (h as Habit).timeOfDay === 'string' &&
+    ((h as Habit).daysOfWeek === undefined ||
+      (Array.isArray((h as Habit).daysOfWeek) &&
+        (h as Habit).daysOfWeek!.every((d) => typeof d === 'number' && d >= 0 && d <= 6)))
   );
 }
 

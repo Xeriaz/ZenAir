@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Sun, Sunset, Moon, Sparkles, Filter, CheckCircle } from 'lucide-react';
+import { Sun, Sunset, Moon, Sparkles, Filter, CheckCircle, Plus } from 'lucide-react';
 import type { Habit, HabitDifficulty, HabitType, TimeOfDay } from '../../types';
-import { HabitQuickAdd } from './HabitQuickAdd';
 import { HabitCard } from './HabitCard';
 import { HabitFormModal } from './HabitFormModal';
 import { useHabits } from '../../hooks/useHabits';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { isHabitScheduledForToday } from '../../utils/dates';
 
 export const HabitList: React.FC = () => {
   const { t } = useTranslation();
@@ -28,13 +28,14 @@ export const HabitList: React.FC = () => {
   });
 
   const dailyHabits = habits.filter((h) => h.type === 'daily');
-  const completedDailyCount = dailyHabits.filter((h) => {
+  const todayDailyHabits = dailyHabits.filter((h) => isHabitScheduledForToday(h.daysOfWeek));
+  const completedDailyCount = todayDailyHabits.filter((h) => {
     const log = h.id ? todayLogsMap.get(h.id) : undefined;
     return log && log.count > 0;
   }).length;
 
-  const completionPct = dailyHabits.length > 0
-    ? Math.round((completedDailyCount / dailyHabits.length) * 100)
+  const completionPct = todayDailyHabits.length > 0
+    ? Math.round((completedDailyCount / todayDailyHabits.length) * 100)
     : 0;
 
   const handleOpenEdit = (habit: Habit) => {
@@ -47,6 +48,7 @@ export const HabitList: React.FC = () => {
     type: HabitType;
     timeOfDay: TimeOfDay;
     scheduledTime?: string;
+    daysOfWeek?: number[];
     difficulty: HabitDifficulty;
   }) => {
     if (editingHabit && editingHabit.id) {
@@ -59,15 +61,27 @@ export const HabitList: React.FC = () => {
   return (
     <div className="flex flex-col gap-4 max-w-2xl mx-auto px-4 pt-3 pb-8">
       {/* Daily Completion Header Summary */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 rounded-3xl p-4 flex flex-col gap-2.5 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-sm font-bold text-white tracking-tight">{t.habits.todayHabits}</h2>
+      <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <CheckCircle className="w-5 h-5 text-cyan-400 shrink-0" />
+            <h2 className="text-sm font-bold text-white tracking-tight truncate">{t.habits.todayHabits}</h2>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-            {completedDailyCount} / {dailyHabits.length} {t.habits.done} ({completionPct}%)
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+              {completedDailyCount} / {todayDailyHabits.length} {t.habits.done} ({completionPct}%)
+            </span>
+            <button
+              onClick={() => {
+                setEditingHabit(null);
+                setIsModalOpen(true);
+              }}
+              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3 py-1.5 rounded-xl flex items-center gap-1 transition active:scale-95 shadow-md shadow-cyan-500/20 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t.habits.add}</span>
+            </button>
+          </div>
         </div>
 
         <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
@@ -77,17 +91,6 @@ export const HabitList: React.FC = () => {
           />
         </div>
       </div>
-
-      {/* Inline Quick Add */}
-      <HabitQuickAdd
-        onAdd={async (data) => {
-          await createHabit(data);
-        }}
-        onOpenAdvanced={() => {
-          setEditingHabit(null);
-          setIsModalOpen(true);
-        }}
-      />
 
       {/* Time-of-day Filter Pills */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -114,12 +117,22 @@ export const HabitList: React.FC = () => {
       {/* Habit Cards */}
       <div className="flex flex-col gap-2.5">
         {filteredHabits.length === 0 ? (
-          <div className="text-center py-12 px-4 rounded-3xl bg-slate-900/40 border border-slate-800/80 flex flex-col items-center justify-center gap-2">
+          <div className="text-center py-12 px-4 rounded-3xl bg-slate-900/40 border border-slate-800/80 flex flex-col items-center justify-center gap-3">
             <Sparkles className="w-8 h-8 text-cyan-400/40" />
             <p className="text-sm font-semibold text-slate-300">{t.habits.noHabitsTitle}</p>
             <p className="text-xs text-slate-500 max-w-xs">
               {t.habits.noHabitsDesc}
             </p>
+            <button
+              onClick={() => {
+                setEditingHabit(null);
+                setIsModalOpen(true);
+              }}
+              className="mt-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-md shadow-cyan-500/20 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t.habits.modalNewTitle}</span>
+            </button>
           </div>
         ) : (
           filteredHabits.map((habit) => (

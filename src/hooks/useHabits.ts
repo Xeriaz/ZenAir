@@ -121,10 +121,12 @@ export function useHabits() {
     type: HabitType;
     timeOfDay: TimeOfDay;
     scheduledTime?: string;
+    daysOfWeek?: number[];
     difficulty: HabitDifficulty;
   }) => {
     return await db.habits.add({
       ...data,
+      daysOfWeek: data.daysOfWeek && data.daysOfWeek.length > 0 ? data.daysOfWeek : [0, 1, 2, 3, 4, 5, 6],
       streak: 0,
       bestStreak: 0,
       createdAt: new Date().toISOString(),
