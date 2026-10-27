@@ -165,6 +165,7 @@ export interface TranslationSchema {
     vibrationTestBtn: string;
     vibrationTestSuccess: string;
     vibrationSupported: string;
+    vibrationIosSupported: string;
     vibrationUnsupported: string;
   };
 }
@@ -379,6 +380,7 @@ export const translations: Record<Language, TranslationSchema> = {
       vibrationTestBtn: 'Test Vibration Pulse',
       vibrationTestSuccess: 'Vibration pulse triggered!',
       vibrationSupported: 'Supported on this device (Android / Web Vibration API)',
+      vibrationIosSupported: 'Active via iOS Taptic Engine switch workaround',
       vibrationUnsupported: 'Vibration API is not supported by your current browser/device (e.g. iOS Safari/WebKit does not allow Vibration API in web apps).'
     }
   },
@@ -591,6 +593,7 @@ export const translations: Record<Language, TranslationSchema> = {
       vibrationTestBtn: 'Išbandyti vibracijos impulsą',
       vibrationTestSuccess: 'Vibracijos impulsas išsiųstas!',
       vibrationSupported: 'Palaikoma šiame įrenginyje (Android / Web Vibration API)',
+      vibrationIosSupported: 'Aktyvu per iOS Taptic Engine sprendimą',
       vibrationUnsupported: 'Vibracijos API nepalaikoma šioje naršyklėje/įrenginyje (pvz. iOS Safari/WebKit riboja vibraciją žiniatinklio programėlėse).'
     }
   }

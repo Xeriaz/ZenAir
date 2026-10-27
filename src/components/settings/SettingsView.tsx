@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Download, Upload, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles, Trash2, Lock, X, Globe, Vibrate } from 'lucide-react';
 import { useGamification } from '../../hooks/useGamification';
-import { isVibrationSupported, triggerVibration, HAPTIC_PATTERNS } from '../../utils/haptics';
+import { getVibrationSupportType, triggerVibration, HAPTIC_PATTERNS } from '../../utils/haptics';
 import { downloadDatabaseBackup, importDatabaseFromJson, db, INITIAL_HABITS, resetAllDatabaseData } from '../../db/db';
 import { generate50DaysDemoData } from '../../db/seedData';
 import type { Habit } from '../../types';
@@ -11,7 +11,8 @@ export const SettingsView: React.FC = () => {
   const { t, language, setLanguage } = useTranslation();
   const { profile, updatePreferences } = useGamification();
   const vibrationEnabled = profile.vibrationEnabled !== false;
-  const hasVibrationSupport = isVibrationSupported();
+  const supportType = getVibrationSupportType();
+  const hasVibrationSupport = supportType !== 'none';
 
   const handleToggleVibration = async (enabled: boolean) => {
     await updatePreferences({ vibrationEnabled: enabled });
@@ -206,12 +207,19 @@ export const SettingsView: React.FC = () => {
 
         {/* Device support banner */}
         <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px]">
-          {hasVibrationSupport ? (
+          {supportType === 'native' && (
             <span className="text-emerald-400 font-medium flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
               {t.settings.vibrationSupported}
             </span>
-          ) : (
+          )}
+          {supportType === 'ios-switch' && (
+            <span className="text-cyan-400 font-medium flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 inline-block animate-pulse" />
+              {t.settings.vibrationIosSupported}
+            </span>
+          )}
+          {supportType === 'none' && (
             <span className="text-amber-400/90 font-medium flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
               {t.settings.vibrationUnsupported}
