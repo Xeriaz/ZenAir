@@ -35,7 +35,9 @@ export const INITIAL_USER_PROFILE: UserProfile = {
   streakFreezes: 0,
   defaultBreathingId: 'box',
   preferredSessionMinutes: 3,
-  theme: 'dark'
+  theme: 'dark',
+  wakeTime: '06:00',
+  targetBedtime: '22:00'
 };
 
 export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
@@ -43,13 +45,30 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     title: 'Morning Hydration (500ml)',
     type: 'daily',
     timeOfDay: 'morning',
-    scheduledTime: '07:30',
+    scheduledTime: '07:00',
     daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 0,
     bestStreak: 0,
     difficulty: 'easy',
     createdAt: new Date().toISOString(),
     archived: false
+  },
+  {
+    title: 'Workday Latte / Coffee Pacer',
+    type: 'positive_negative',
+    timeOfDay: 'morning',
+    scheduledTime: '07:30',
+    daysOfWeek: [1, 2, 3, 4, 5],
+    streak: 0,
+    bestStreak: 0,
+    difficulty: 'medium',
+    createdAt: new Date().toISOString(),
+    archived: false,
+    enablePacing: true,
+    intervalHours: 3.5,
+    dailyCap: 2,
+    enforceCurfew: true,
+    substituteTip: 'Cacao'
   },
   {
     title: 'Guided Breathing Reset',
@@ -90,7 +109,7 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
     title: 'Evening Screen-Free Wind-down',
     type: 'daily',
     timeOfDay: 'evening',
-    scheduledTime: '21:30',
+    scheduledTime: '21:00',
     daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
     streak: 0,
     bestStreak: 0,
@@ -105,9 +124,14 @@ export const INITIAL_HABITS: Omit<Habit, 'id'>[] = [
  * Only ensures the initial clean user profile exists without seeding dummy data.
  */
 export async function initializeDatabase(): Promise<void> {
-  const profileCount = await db.userProfile.count();
-  if (profileCount === 0) {
+  const existingProfile = await db.userProfile.toCollection().first();
+  if (!existingProfile) {
     await db.userProfile.put(INITIAL_USER_PROFILE);
+  } else if (!existingProfile.wakeTime || !existingProfile.targetBedtime) {
+    await db.userProfile.update(existingProfile.id ?? 1, {
+      wakeTime: existingProfile.wakeTime || '06:00',
+      targetBedtime: existingProfile.targetBedtime || '22:00'
+    });
   }
 }
 

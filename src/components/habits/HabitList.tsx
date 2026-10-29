@@ -9,7 +9,7 @@ import { isHabitScheduledForToday } from '../../utils/dates';
 
 export const HabitList: React.FC = () => {
   const { t } = useTranslation();
-  const { habits, todayLogsMap, toggleDailyHabit, logHabitCounter, createHabit, updateHabit, deleteHabit } = useHabits();
+  const { habits, userProfile, todayLogsMap, toggleDailyHabit, logHabitCounter, createHabit, updateHabit, deleteHabit } = useHabits();
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -50,6 +50,11 @@ export const HabitList: React.FC = () => {
     scheduledTime?: string;
     daysOfWeek?: number[];
     difficulty: HabitDifficulty;
+    enablePacing?: boolean;
+    intervalHours?: number;
+    dailyCap?: number;
+    enforceCurfew?: boolean;
+    substituteTip?: string;
   }) => {
     if (editingHabit && editingHabit.id) {
       await updateHabit(editingHabit.id, data);
@@ -140,6 +145,7 @@ export const HabitList: React.FC = () => {
               key={habit.id}
               habit={habit}
               log={habit.id ? todayLogsMap.get(habit.id) : undefined}
+              userProfile={userProfile}
               onToggleDaily={toggleDailyHabit}
               onCounter={logHabitCounter}
               onEdit={handleOpenEdit}

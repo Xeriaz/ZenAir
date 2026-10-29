@@ -61,6 +61,25 @@ export interface TranslationSchema {
     restDay: string;
     modalSaving: string;
     deleteConfirm: string;
+    coffeePresetBtn: string;
+    coffeePresetDefaultTitle: string;
+    pacingSectionTitle: string;
+    pacingEnable: string;
+    pacingIntervalHours: string;
+    pacingDailyCap: string;
+    pacingEnforceCurfew: string;
+    pacingSubstituteTip: string;
+    pacingSubstitutePlaceholder: string;
+    pacingWindowOpen: string;
+    pacingUntilCurfew: string;
+    pacingNextWindow: string;
+    pacingWait: string;
+    pacingFirstDelay: string;
+    pacingCurfewActive: string;
+    pacingCapReached: string;
+    pacingSwapTo: string;
+    pacingCupsLeft: string;
+    pacingLastCup: string;
   };
   breathing: {
     selectMethod: string;
@@ -124,6 +143,14 @@ export interface TranslationSchema {
     languageDesc: string;
     english: string;
     lithuanian: string;
+    sleepRhythmTitle: string;
+    sleepRhythmDesc: string;
+    wakeTimeLabel: string;
+    bedtimeLabel: string;
+    firstCoffeeWindowLabel: string;
+    doseSpacingLabel: string;
+    hardCurfewLabel: string;
+    rhythmSaved: string;
     backupTitle: string;
     backupDesc: string;
     exportJson: string;
@@ -218,7 +245,26 @@ export const translations: Record<Language, TranslationSchema> = {
       daysWeekends: 'Weekends',
       restDay: 'Rest day',
       modalSaving: 'Saving...',
-      deleteConfirm: 'Are you sure you want to delete this habit?'
+      deleteConfirm: 'Are you sure you want to delete this habit?',
+      coffeePresetBtn: '☕ Coffee / Latte Pacer Preset',
+      coffeePresetDefaultTitle: 'Workday Latte / Coffee',
+      pacingSectionTitle: 'Smart Pacing & Curfew (Caffeine)',
+      pacingEnable: 'Enable Dose Spacing & Sleep Curfew',
+      pacingIntervalHours: 'Min Spacing (Hours)',
+      pacingDailyCap: 'Daily Cap (Cups)',
+      pacingEnforceCurfew: '10h Pre-Sleep Curfew',
+      pacingSubstituteTip: 'Substitute Drink',
+      pacingSubstitutePlaceholder: 'e.g. Cacao, Rooibos',
+      pacingWindowOpen: 'Coffee window open',
+      pacingUntilCurfew: 'until',
+      pacingNextWindow: 'Next coffee window:',
+      pacingWait: 'wait',
+      pacingFirstDelay: 'Morning cortisol peak • Wait until',
+      pacingCurfewActive: 'Curfew active',
+      pacingCapReached: 'Daily cap reached',
+      pacingSwapTo: 'Swap to',
+      pacingCupsLeft: 'left today',
+      pacingLastCup: 'Last:'
     },
     breathing: {
       selectMethod: 'Select Breathing Method',
@@ -328,6 +374,14 @@ export const translations: Record<Language, TranslationSchema> = {
       languageDesc: 'Choose your preferred app display language.',
       english: 'English',
       lithuanian: 'Lietuvių',
+      sleepRhythmTitle: 'Sleep & Caffeine Rhythm (80 kg Profile)',
+      sleepRhythmDesc: 'Calibrates your morning adenosine delay (+90m) and 10-hour pre-sleep caffeine cutoff so circulating caffeine drops below 25 mg by bedtime.',
+      wakeTimeLabel: 'Wake-Up Time',
+      bedtimeLabel: 'Target Bedtime',
+      firstCoffeeWindowLabel: '1st Coffee Window',
+      doseSpacingLabel: 'Optimal Spacing',
+      hardCurfewLabel: 'Hard Curfew (10h)',
+      rhythmSaved: 'Sleep & caffeine schedule updated!',
       backupTitle: 'Local Backup & Restore (JSON)',
       backupDesc: 'ZenAir operates 100% client-side with IndexedDB. Export a local JSON backup anytime so you never lose your progress even if Safari or iOS storage purges.',
       exportJson: 'Export JSON',
@@ -359,7 +413,7 @@ export const translations: Record<Language, TranslationSchema> = {
       importSuccess: 'Data restored successfully! Refreshing UI...',
       importError: 'Import failed:',
       invalidBackupFile: 'Invalid backup JSON file',
-      appArchitecture: 'ZenAir PWA • Local-First Architecture',
+      appArchitecture: 'ZenAir PWA • Local-First Architecture'
     }
   },
   lt: {
@@ -420,7 +474,26 @@ export const translations: Record<Language, TranslationSchema> = {
       daysWeekends: 'Savaitgaliai',
       restDay: 'Poilsio d.',
       modalSaving: 'Išsaugoma...',
-      deleteConfirm: 'Ar tikrai norite ištrinti šį įprotį?'
+      deleteConfirm: 'Ar tikrai norite ištrinti šį įprotį?',
+      coffeePresetBtn: '☕ Kavos / Latte ritmo šablonas',
+      coffeePresetDefaultTitle: 'Darbo dienos Latte / Kava',
+      pacingSectionTitle: 'Išmanusis ritmas ir ribojimas (Kofeinas)',
+      pacingEnable: 'Įjungti intervalų ir miego ribojimą',
+      pacingIntervalHours: 'Min. intervalas (val.)',
+      pacingDailyCap: 'Dienos limitas (puod.)',
+      pacingEnforceCurfew: '10 val. iki miego riba',
+      pacingSubstituteTip: 'Alternatyvus gėrimas',
+      pacingSubstitutePlaceholder: 'pvz., Kakava, Rooibos',
+      pacingWindowOpen: 'Kavos langas atviras',
+      pacingUntilCurfew: 'iki',
+      pacingNextWindow: 'Kitas kavos langas:',
+      pacingWait: 'palaukite',
+      pacingFirstDelay: 'Rytinis kortizolio pikas • Palaukite iki',
+      pacingCurfewActive: 'Kofeino riba aktyvi',
+      pacingCapReached: 'Pasiektas dienos limitas',
+      pacingSwapTo: 'Rinkitės:',
+      pacingCupsLeft: 'liko šiandien',
+      pacingLastCup: 'Pask.:'
     },
     breathing: {
       selectMethod: 'Pasirinkite kvėpavimo metodą',
@@ -490,7 +563,7 @@ export const translations: Record<Language, TranslationSchema> = {
         physio_sigh: {
           name: 'Fiziologinis atodūsis',
           tagline: 'Huberman dvigubas įkvėpimas + prailgintas iškvėpimas',
-          description: 'Greičiausias biologinis būdas sumažinti ūmų stresą realiu laiku. Vėl išskleidžia subliuškusias plaučių alveoles ir pašalina CO2 perteklių.',
+          description: 'Greičiausias biologinis būdas sumažinti ūmų stresą realiu laiku. Vėl išskleidžia subliūškusias plaučių alveoles ir pašalina CO2 perteklių.',
           benefits: ['Akimirksniu palengvina nervų sistemos įtampą', 'Pašalina krūtinės sunkumą ir dusulį', 'Greitas atsistatymas streso šuolių metu'],
           steps: [
             { name: 'Pirmas įkvėpimas', cue: 'Pirmas gilus įkvėpimas' },
@@ -530,6 +603,14 @@ export const translations: Record<Language, TranslationSchema> = {
       languageDesc: 'Pasirinkite norimą programėlės rodymo kalbą.',
       english: 'English',
       lithuanian: 'Lietuvių',
+      sleepRhythmTitle: 'Miego ir kofeino ritmas (80 kg profilis)',
+      sleepRhythmDesc: 'Kalibruoja rytinį adenozino atidėjimą (+90 min.) ir 10 val. iki miego kofeino ribą, kad kofeino kiekis prieš miegą nukristų žemiau 25 mg.',
+      wakeTimeLabel: 'Kėlimosi laikas',
+      bedtimeLabel: 'Miego laikas',
+      firstCoffeeWindowLabel: '1-os kavos langas',
+      doseSpacingLabel: 'Optimalus intervalas',
+      hardCurfewLabel: 'Griežta riba (10 val.)',
+      rhythmSaved: 'Miego ir kofeino grafikas atnaujintas!',
       backupTitle: 'Vietinė atsarginė kopija ir atkūrimas (JSON)',
       backupDesc: 'ZenAir veikia 100% naršyklėje su IndexedDB. Bet kada eksportuokite vietinę JSON kopiją, kad neprarastumėte duomenų net išvalius naršyklės atmintį.',
       exportJson: 'Eksportuoti JSON',
@@ -561,7 +642,7 @@ export const translations: Record<Language, TranslationSchema> = {
       importSuccess: 'Duomenys sėkmingai atkurti! Puslapis perkraunamas...',
       importError: 'Importavimas nepavyko:',
       invalidBackupFile: 'Neteisingas atsarginės kopijos JSON failas',
-      appArchitecture: 'ZenAir PWA • Vietinė architektūra',
+      appArchitecture: 'ZenAir PWA • Vietinė architektūra'
     }
   }
 };

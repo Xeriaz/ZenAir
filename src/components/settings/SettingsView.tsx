@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { Download, Upload, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles, Trash2, Lock, X, Globe } from 'lucide-react';
-import { downloadDatabaseBackup, importDatabaseFromJson, db, INITIAL_HABITS, resetAllDatabaseData } from '../../db/db';
+import { Download, Upload, Database, Check, AlertCircle, RefreshCw, Smartphone, Sparkles, Trash2, Lock, X, Globe, Coffee } from 'lucide-react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { downloadDatabaseBackup, importDatabaseFromJson, db, INITIAL_HABITS, INITIAL_USER_PROFILE, resetAllDatabaseData } from '../../db/db';
 import { generate50DaysDemoData } from '../../db/seedData';
 import type { Habit } from '../../types';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { calculateCurfewTime, calculateFirstWindowTime } from '../../utils/caffeineTiming';
 
 export const SettingsView: React.FC = () => {
   const { t, language, setLanguage } = useTranslation();
@@ -16,6 +18,28 @@ export const SettingsView: React.FC = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const profile = useLiveQuery(async () => {
+    const first = await db.userProfile.toCollection().first();
+    return first ?? INITIAL_USER_PROFILE;
+  }, []);
+
+  const wakeTime = profile?.wakeTime || '06:00';
+  const targetBedtime = profile?.targetBedtime || '22:00';
+  const firstCoffeeWindow = calculateFirstWindowTime(wakeTime, 90);
+  const hardCurfew = calculateCurfewTime(targetBedtime, 10);
+
+  const handleScheduleChange = async (field: 'wakeTime' | 'targetBedtime', value: string) => {
+    if (!value) return;
+    const current = await db.userProfile.toCollection().first();
+    if (current && current.id) {
+      await db.userProfile.update(current.id, { [field]: value });
+    } else {
+      await db.userProfile.put({ ...INITIAL_USER_PROFILE, [field]: value });
+    }
+    setStatusMessage({ text: t.settings.rhythmSaved });
+    setTimeout(() => setStatusMessage(null), 2500);
+  };
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -116,6 +140,60 @@ export const SettingsView: React.FC = () => {
           <span>{statusMessage.text}</span>
         </div>
       )}
+
+      {/* Sleep & Caffeine Rhythm Configuration */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Coffee className="w-5 h-5 text-amber-400" />
+          <h3 className="text-sm font-bold text-white tracking-tight">{t.settings.sleepRhythmTitle}</h3>
+        </div>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          {t.settings.sleepRhythmDesc}
+        </p>
+
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+              {t.settings.wakeTimeLabel}
+            </label>
+            <input
+              type="time"
+              aria-label={t.settings.wakeTimeLabel}
+              value={wakeTime}
+              onChange={(e) => handleScheduleChange('wakeTime', e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500 cursor-pointer"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+              {t.settings.bedtimeLabel}
+            </label>
+            <input
+              type="time"
+              aria-label={t.settings.bedtimeLabel}
+              value={targetBedtime}
+              onChange={(e) => handleScheduleChange('targetBedtime', e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500 cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-center">
+          <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">{t.settings.firstCoffeeWindowLabel}</div>
+            <div className="text-xs font-bold text-emerald-400 mt-0.5">{firstCoffeeWindow}</div>
+          </div>
+          <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">{t.settings.doseSpacingLabel}</div>
+            <div className="text-xs font-bold text-cyan-400 mt-0.5">3.5h – 4.0h</div>
+          </div>
+          <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">{t.settings.hardCurfewLabel}</div>
+            <div className="text-xs font-bold text-amber-400 mt-0.5">{hardCurfew}</div>
+          </div>
+        </div>
+      </div>
 
       {/* Language Selection */}
       <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 shadow-sm">

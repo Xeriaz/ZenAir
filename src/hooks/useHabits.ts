@@ -1,11 +1,16 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/db';
+import { db, INITIAL_USER_PROFILE } from '../db/db';
 import type { Habit, HabitDifficulty, HabitLog, HabitType, TimeOfDay } from '../types';
 import { getTodayDateString, getYesterdayDateString, calculateStreakFromDates } from '../utils/dates';
 
 export function useHabits() {
   const todayStr = getTodayDateString();
   const yesterdayStr = getYesterdayDateString();
+
+  const userProfile = useLiveQuery(async () => {
+    const first = await db.userProfile.toCollection().first();
+    return first ?? INITIAL_USER_PROFILE;
+  }, []);
 
   const habits = useLiveQuery(async () => {
     return await db.habits.filter((h) => !h.archived).toArray();
@@ -97,9 +102,10 @@ export function useHabits() {
         if (newCount === 0) {
           await db.habitLogs.delete(existingLog.id);
         } else {
+          // Only update timestamp when incrementing (logging a new dose/cup)
           await db.habitLogs.update(existingLog.id, {
             count: newCount,
-            timestamp: Date.now()
+            ...(isPositive ? { timestamp: Date.now() } : {})
           });
         }
       } else if (newCount > 0) {
@@ -123,6 +129,12 @@ export function useHabits() {
     scheduledTime?: string;
     daysOfWeek?: number[];
     difficulty: HabitDifficulty;
+    enablePacing?: boolean;
+    intervalHours?: number;
+    dailyCap?: number;
+    enforceCurfew?: boolean;
+    curfewTime?: string;
+    substituteTip?: string;
   }) => {
     return await db.habits.add({
       ...data,
@@ -147,6 +159,7 @@ export function useHabits() {
 
   return {
     habits: activeHabits,
+    userProfile: userProfile ?? INITIAL_USER_PROFILE,
     todayLogsMap: logsMap,
     toggleDailyHabit,
     logHabitCounter,

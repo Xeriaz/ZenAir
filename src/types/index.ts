@@ -14,6 +14,13 @@ export interface Habit {
   difficulty: HabitDifficulty;
   createdAt: string; // ISO String
   archived: boolean;
+  // Smart Pacing & Circadian Curfew (for positive_negative counter habits like Coffee / Latte)
+  enablePacing?: boolean;
+  intervalHours?: number; // Minimum hours between doses (e.g. 3.5)
+  dailyCap?: number; // Maximum recommended daily count (e.g. 2)
+  enforceCurfew?: boolean; // Enforce 10h pre-bedtime cutoff
+  curfewTime?: string; // Optional manual curfew override HH:mm (e.g. "12:00")
+  substituteTip?: string; // Recommended alternative after curfew/cap (e.g. "Cacao")
 }
 
 export interface HabitLog {
@@ -42,6 +49,8 @@ export interface UserProfile {
   preferredSessionMinutes: number;
   theme: "dark" | "light";
   language?: "en" | "lt";
+  wakeTime?: string; // HH:mm format, default "06:00"
+  targetBedtime?: string; // HH:mm format, default "22:00"
 }
 
 export type BreathingExerciseId = "box" | "relax_478" | "wim_hof" | "coherent_55" | "physio_sigh";

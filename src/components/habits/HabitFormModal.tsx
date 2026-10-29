@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Coffee } from 'lucide-react';
 import type { Habit, HabitDifficulty, HabitType, TimeOfDay } from '../../types';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { DAYS_OF_WEEK } from '../../utils/dates';
@@ -14,6 +14,11 @@ interface HabitFormModalProps {
     scheduledTime?: string;
     daysOfWeek?: number[];
     difficulty: HabitDifficulty;
+    enablePacing?: boolean;
+    intervalHours?: number;
+    dailyCap?: number;
+    enforceCurfew?: boolean;
+    substituteTip?: string;
   }) => Promise<void>;
   initialHabit?: Habit | null;
 }
@@ -31,6 +36,11 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
   const [scheduledTime, setScheduledTime] = useState('');
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [difficulty, setDifficulty] = useState<HabitDifficulty>('easy');
+  const [enablePacing, setEnablePacing] = useState(false);
+  const [intervalHours, setIntervalHours] = useState<number>(3.5);
+  const [dailyCap, setDailyCap] = useState<number>(2);
+  const [enforceCurfew, setEnforceCurfew] = useState(true);
+  const [substituteTip, setSubstituteTip] = useState('Cacao');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -45,6 +55,11 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
           : [0, 1, 2, 3, 4, 5, 6]
       );
       setDifficulty(initialHabit.difficulty);
+      setEnablePacing(!!initialHabit.enablePacing);
+      setIntervalHours(initialHabit.intervalHours ?? 3.5);
+      setDailyCap(initialHabit.dailyCap ?? 2);
+      setEnforceCurfew(initialHabit.enforceCurfew !== false);
+      setSubstituteTip(initialHabit.substituteTip || 'Cacao');
     } else {
       setTitle('');
       setType('daily');
@@ -52,10 +67,31 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
       setScheduledTime('');
       setDaysOfWeek([0, 1, 2, 3, 4, 5, 6]);
       setDifficulty('easy');
+      setEnablePacing(false);
+      setIntervalHours(3.5);
+      setDailyCap(2);
+      setEnforceCurfew(true);
+      setSubstituteTip('Cacao');
     }
   }, [initialHabit, isOpen]);
 
   if (!isOpen) return null;
+
+  const handleApplyCoffeePreset = () => {
+    if (!title.trim()) {
+      setTitle(t.habits.coffeePresetDefaultTitle);
+    }
+    setType('positive_negative');
+    setTimeOfDay('morning');
+    setScheduledTime('07:30');
+    setDaysOfWeek([1, 2, 3, 4, 5]);
+    setDifficulty('medium');
+    setEnablePacing(true);
+    setIntervalHours(3.5);
+    setDailyCap(2);
+    setEnforceCurfew(true);
+    setSubstituteTip('Cacao');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,13 +99,19 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
 
     setSaving(true);
     try {
+      const isCounter = type === 'positive_negative';
       await onSave({
         title: title.trim(),
         type,
         timeOfDay,
         scheduledTime: scheduledTime.trim() || undefined,
         daysOfWeek: daysOfWeek.length > 0 ? daysOfWeek : [0, 1, 2, 3, 4, 5, 6],
-        difficulty
+        difficulty,
+        enablePacing: isCounter ? enablePacing : false,
+        intervalHours: isCounter && enablePacing ? Number(intervalHours) || 3.5 : undefined,
+        dailyCap: isCounter && enablePacing ? Number(dailyCap) || 2 : undefined,
+        enforceCurfew: isCounter && enablePacing ? enforceCurfew : undefined,
+        substituteTip: isCounter && enablePacing ? substituteTip.trim() || 'Cacao' : undefined
       });
       onClose();
     } finally {
@@ -97,6 +139,16 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 pt-2.5">
           {/* Scrollable inputs container */}
           <div className="overflow-y-auto flex-1 flex flex-col gap-3 pr-0.5">
+            {/* One-tap Coffee / Latte Pacer Preset */}
+            <button
+              type="button"
+              onClick={handleApplyCoffeePreset}
+              className="w-full py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-98"
+            >
+              <Coffee className="w-3.5 h-3.5 text-amber-400" />
+              <span>{t.habits.coffeePresetBtn}</span>
+            </button>
+
             <div>
               <label className="block text-[11px] font-semibold text-slate-300 mb-1">
                 {t.habits.modalHabitTitle}
@@ -141,6 +193,87 @@ export const HabitFormModal: React.FC<HabitFormModalProps> = ({
                 </select>
               </div>
             </div>
+
+            {/* Smart Pacing & Curfew configuration for +/- counter habits */}
+            {type === 'positive_negative' && (
+              <div className="bg-slate-950/80 border border-amber-500/25 rounded-2xl p-3 flex flex-col gap-2.5">
+                <label className="flex items-center justify-between gap-2 cursor-pointer">
+                  <div className="flex items-center gap-1.5">
+                    <Coffee className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-xs font-bold text-amber-300">
+                      {t.habits.pacingSectionTitle}
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={enablePacing}
+                    onChange={(e) => setEnablePacing(e.target.checked)}
+                    className="w-4 h-4 accent-amber-400 rounded cursor-pointer"
+                  />
+                </label>
+
+                {enablePacing && (
+                  <div className="flex flex-col gap-2.5 pt-1 border-t border-slate-800/80">
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-400 mb-1">
+                          {t.habits.pacingIntervalHours}
+                        </label>
+                        <input
+                          type="number"
+                          step="0.25"
+                          min="0.5"
+                          max="12"
+                          value={intervalHours}
+                          onChange={(e) => setIntervalHours(parseFloat(e.target.value) || 3.5)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-400 mb-1">
+                          {t.habits.pacingDailyCap}
+                        </label>
+                        <input
+                          type="number"
+                          step="1"
+                          min="1"
+                          max="10"
+                          value={dailyCap}
+                          onChange={(e) => setDailyCap(parseInt(e.target.value, 10) || 2)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5 items-center">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-400 mb-1">
+                          {t.habits.pacingSubstituteTip}
+                        </label>
+                        <input
+                          type="text"
+                          value={substituteTip}
+                          onChange={(e) => setSubstituteTip(e.target.value)}
+                          placeholder={t.habits.pacingSubstitutePlaceholder}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500"
+                        />
+                      </div>
+
+                      <label className="flex items-center gap-2 pt-4 cursor-pointer text-[11px] text-slate-300 font-medium">
+                        <input
+                          type="checkbox"
+                          checked={enforceCurfew}
+                          onChange={(e) => setEnforceCurfew(e.target.checked)}
+                          className="w-3.5 h-3.5 accent-amber-400 rounded cursor-pointer"
+                        />
+                        <span>{t.habits.pacingEnforceCurfew}</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="min-w-0">
